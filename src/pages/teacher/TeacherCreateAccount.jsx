@@ -6,7 +6,6 @@ export default function TeacherCreateAccount() {
 const navigate = useNavigate();
 const location = useLocation();
 
-// Determine role based on route path
 const role = location.pathname.includes("teacher") ? "Teacher" : "Admin";
 
 const [formData, setFormData] = useState({
@@ -33,20 +32,16 @@ e.preventDefault();
 setError("");
 setSuccess("");
 
-
-// Validate WMSU email  
 if (!formData.email.endsWith("@wmsu.edu.ph")) {  
   setError("Please use your official WMSU email address.");  
   return;  
 }  
 
-// Validate password match  
 if (formData.password !== formData.confirmPassword) {  
   setError("Passwords do not match.");  
   return;  
 }  
 
-// Mock reCAPTCHA  
 const captchaChecked = document.getElementById("captcha").checked;  
 if (!captchaChecked) {  
   setError("Please verify that you are not a robot.");  
@@ -56,7 +51,6 @@ if (!captchaChecked) {
 console.log("Teacher Account Created:", { ...formData, role });  
 setSuccess(`✅ ${role} account created successfully!`);  
 
-// Redirect to Teacher Dashboard after 1 second  
 setTimeout(() => {  
   navigate("/teacher/teacher-dashboard");  
 }, 1000);  
@@ -92,7 +86,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
       onSubmit={handleSubmit}  
       className="space-y-4 text-left mx-auto max-w-[600px]"  
     >  
-      {/* First Name */}  
       <div>  
         <label className="text-sm font-medium text-gray-700">First Name</label>  
         <input  
@@ -105,7 +98,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         />  
       </div>  
 
-      {/* Last Name */}  
       <div>  
         <label className="text-sm font-medium text-gray-700">Last Name</label>  
         <input  
@@ -118,7 +110,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         />  
       </div>  
 
-      {/* Username */}  
       <div>  
         <label className="text-sm font-medium text-gray-700">Username</label>  
         <input  
@@ -131,7 +122,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         />  
       </div>  
 
-      {/* Email */}  
       <div>  
         <label className="text-sm font-medium text-gray-700">Email</label>  
         <input  
@@ -145,7 +135,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         />  
       </div>  
 
-      {/* Password */}  
       <div className="relative">  
         <label className="text-sm font-medium text-gray-700">Password</label>  
         <input  
@@ -165,7 +154,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         </button>  
       </div>  
 
-      {/* Confirm Password */}  
       <div className="relative">  
         <label className="text-sm font-medium text-gray-700">Confirm Password</label>  
         <input  
@@ -185,7 +173,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         </button>  
       </div>  
 
-      {/* reCAPTCHA */}  
       <hr className="border-gray-400 mt-8 mb-5" />  
       <div className="flex items-center justify-center space-x-3 border border-gray-400 rounded-md p-3 w-[280px] mx-auto">  
         <input id="captcha" type="checkbox" />  
@@ -193,7 +180,6 @@ Automated Grades Portal and Students Attendance using QR Code </h2> </div>
         <div className="border border-gray-400 p-2 text-[10px] text-gray-500">reCAPTCHA</div>  
       </div>  
 
-      {/* Buttons */}  
       <div className="flex justify-center space-x-3 mt-8">  
         <button  
           type="submit"  

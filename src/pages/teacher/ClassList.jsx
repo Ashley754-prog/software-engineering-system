@@ -1,63 +1,73 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ViewColumnsIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export default function ClassList() {
-  // Mock class data (replace later with API or shared state)
-  const mockClasses = [
-    { id: 1, grade: "Grade 6", section: "A" },
-    { id: 2, grade: "Grade 6", section: "B" },
-    { id: 3, grade: "Grade 5", section: "C" },
-  ];
-
-  // Mock student data (normally fetched per class)
-  const mockStudents = {
-    "Grade 6-A": [
-      { lrn: "12345", name: "Alice Santos", generalAverage: 92 },
-      { lrn: "12346", name: "Ben Cruz", generalAverage: 89 },
-      { lrn: "12347", name: "Cara Dela Cruz", generalAverage: 95 },
-    ],
-    "Grade 6-B": [
-      { lrn: "12348", name: "Daniel Reyes", generalAverage: 84 },
-      { lrn: "12349", name: "Ella Lim", generalAverage: 90 },
-    ],
-  };
-
+  const [allStudents, setAllStudents] = useState([]);
   const [query, setQuery] = useState("");
   const [filteredClasses, setFilteredClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [students, setStudents] = useState([]);
 
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("studentGrades")) || [];
+    setAllStudents(stored);
+  }, []);
+
   const handleSearch = () => {
-    const results = mockClasses.filter((c) =>
-      `${c.grade} ${c.section}`.toLowerCase().includes(query.toLowerCase())
+    if (!query.trim()) {
+      setFilteredClasses([]);
+      return;
+    }
+
+    const parts = query.trim().split(" ");
+    const gradeQuery = parts[0];
+    const sectionQuery = parts.slice(1).join(" ");
+
+    const results = allStudents.filter(
+      (s) =>
+        s.gradeLevel.toString().toLowerCase().includes(gradeQuery.toLowerCase()) &&
+        s.section.toLowerCase().includes(sectionQuery.toLowerCase())
     );
-    setFilteredClasses(results);
-    setSelectedClass(null);
-    setStudents([]);
+
+    const uniqueClasses = Array.from(
+      new Set(results.map((r) => `${r.gradeLevel}-${r.section}`))
+    ).map((id, index) => {
+      const [gradeLevel, section] = id.split("-");
+      return { id: index + 1, gradeLevel, section };
+    });
+
+    setFilteredClasses(uniqueClasses);
   };
 
-  const handleSelectClass = (grade, section) => {
-    const key = `${grade}-${section}`;
-    const classStudents = mockStudents[key] || [];
+  const handleSelectGrade = (grade) => {
+    const sections = Array.from(
+      new Set(
+        allStudents
+          .filter((s) => s.gradeLevel === grade)
+          .map((s) => s.section)
+      )
+    ).map((section, index) => ({ id: index + 1, gradeLevel: grade, section }));
 
-    // Sort by general average descending
-    const sorted = [...classStudents].sort(
-      (a, b) => b.generalAverage - a.generalAverage
+    setFilteredClasses(sections);
+  };
+
+  const handleSelectClass = (gradeLevel, section) => {
+    const storedStudents = JSON.parse(localStorage.getItem("studentGrades")) || [];
+    const classStudents = storedStudents.filter(
+      (s) => s.gradeLevel === gradeLevel && s.section === section
     );
 
-    // Add rank automatically
+    const sorted = [...classStudents].sort((a, b) => b.generalAverage - a.generalAverage);
+
     const ranked = sorted.map((s, i) => ({
       ...s,
       rank: i + 1,
-      grade,
-      section,
     }));
 
-    setSelectedClass({ grade, section });
+    setSelectedClass({ gradeLevel, section });
     setStudents(ranked);
   };
 
-  // 🏆 Color-coded ranks
   const getRankColor = (rank) => {
     if (rank === 1) return "bg-yellow-100 text-yellow-700 font-semibold";
     if (rank === 2) return "bg-gray-100 text-gray-700 font-semibold";
@@ -65,97 +75,118 @@ export default function ClassList() {
     return "";
   };
 
+  const totalClasses = Array.from(new Set(allStudents.map((s) => `${s.gradeLevel}-${s.section}`))).length;
+  const totalStudents = allStudents.length;
+
   return (
-    <div className="space-y-6"> 
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 flex items-center justify-between print:hidden">
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4">
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ViewColumnsIcon className="w-10 h-10 text-red-800" />
           Class List
         </h2>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-2 flex items-center gap-2 max-w-lg">
-        <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
-        <input
-          type="text"
-          placeholder="Search by Grade or Section (e.g., Grade 6 A)"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-red-800 text-white px-3 py-1 rounded-md hover:bg-red-900 transition"
-        >
-          Search
-        </button>
+      <div className="bg-white rounded-lg shadow pt-2 pb-3 border border-gray-300">
+      <div className="w-full flex justify-center mt-10">
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-2 flex items-center gap-2 w-3/4 max-w-3xl">
+          <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by Grade or Section (e.g., 6 LOYALTY)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400"
+          />
+          <button
+            onClick={handleSearch}
+            className="bg-red-800 text-white px-3 py-1 rounded-md hover:bg-red-900 transition"
+          >
+            Search
+          </button>
+        </div>
       </div>
 
-      {/* Search Results */}
+      <div className="flex justify-center gap-10 flex-wrap my-4 mt-10 mb-10">
+        <div className="bg-gray-100 p-4 rounded-lg shadow text-center w-80 border-l-red-800 border-l-8">
+          <p className="text-gray-500 text-sm">Total Classes</p>
+          <p className="text-2xl font-bold">{totalClasses}</p>
+        </div>
+        <div className="bg-gray-100 p-4 rounded-lg shadow text-center w-80 border-l-red-800 border-l-8">
+          <p className="text-gray-500 text-sm">Total Students</p>
+          <p className="text-2xl font-bold">{totalStudents}</p>
+        </div>
+      </div>
+      </div>
+
       {filteredClasses.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-          <h2 className="font-semibold text-gray-700 mb-2">Search Results:</h2>
-          <div className="space-y-2">
+
+        <div className="flex justify-center mt-4 ml-120">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filteredClasses.map((c) => (
               <button
                 key={c.id}
-                onClick={() => handleSelectClass(c.grade, c.section)}
-                className="block text-left w-full border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition"
+                onClick={() => handleSelectClass(c.gradeLevel, c.section)}
+                className="bg-white rounded-lg shadow border border-gray-500 p-4 hover:shadow-lg transition text-center justify-center h-20 w-60"
               >
-                {c.grade} - {c.section}
+                <div className="font-semibold text-gray-800 text-lg">
+                  {c.gradeLevel} - {c.section}
+                </div>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Class Table */}
-      {selectedClass && (
-        <div className="bg-white rounded-lg shadow-md border border-gray-300 overflow-hidden">
-          <div className="bg-red-800 text-white px-6 py-3 text-lg font-semibold">
-            {selectedClass.grade} - {selectedClass.section}
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-center">
-              <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold border-b">
-                <tr>
-                  <th className="px-3 py-2 border">Rank</th>
-                  <th className="px-3 py-2 border">LRN</th>
-                  <th className="px-3 py-2 border text-left">Name</th>
-                  <th className="px-3 py-2 border">Grade</th>
-                  <th className="px-3 py-2 border">Section</th>
-                  <th className="px-3 py-2 border">General Average</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.length > 0 ? (
-                  students.map((s) => (
-                    <tr key={s.lrn} className={`${getRankColor(s.rank)} hover:bg-gray-50`}>
+      <div className="bg-white rounded-lg shadow-md border border-gray-300 overflow-hidden mt-4">
+        <div className="bg-red-800 text-white px-6 py-3 text-lg font-semibold">
+          {selectedClass
+            ? `${selectedClass.gradeLevel} - ${selectedClass.section}`
+            : "Select a class to view students"}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-center">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold border-b">
+              <tr>
+                <th className="px-3 py-2 border">Rank</th>
+                <th className="px-3 py-2 border">LRN</th>
+                <th className="px-3 py-2 border text-left">Name</th>
+                <th className="px-3 py-2 border">Grade</th>
+                <th className="px-3 py-2 border">Section</th>
+                <th className="px-3 py-2 border">General Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.length > 0
+                ? students.map((s) => (
+                    <tr
+                      key={s.lrn}
+                      className={`${getRankColor(s.rank)} hover:bg-gray-50`}
+                    >
                       <td className="border px-3 py-2">{s.rank}</td>
                       <td className="border px-3 py-2">{s.lrn}</td>
                       <td className="border px-3 py-2 text-left">{s.name}</td>
-                      <td className="border px-3 py-2">{s.grade}</td>
+                      <td className="border px-3 py-2">{s.gradeLevel}</td>
                       <td className="border px-3 py-2">{s.section}</td>
-                      <td className="border px-3 py-2 font-semibold">
-                        {s.generalAverage}
-                      </td>
+                      <td className="border px-3 py-2 font-semibold">{s.generalAverage.toFixed(2)}</td>
                     </tr>
                   ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="py-4 text-gray-500 italic">
-                      No students found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                :
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
+                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
+                      <td className="border px-3 py-2 text-left text-gray-400 italic">-</td>
+                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
+                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
+                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 }

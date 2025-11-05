@@ -5,7 +5,6 @@ import { UserGroupIcon } from "@heroicons/react/24/solid";
 export default function ReportsPage() {
   const [section, setSection] = useState("Grade 1 - Section A");
 
-  // Example data
   const attendanceData = [
     { date: "2025-10-25", present: 28 },
     { date: "2025-10-26", present: 27 },
@@ -29,7 +28,6 @@ export default function ReportsPage() {
             </h2>
         </div>
 
-      {/* Section Filter */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200 flex items-center gap-4">
         <label className="text-sm font-medium text-gray-700">Section:</label>
         <select
@@ -43,7 +41,6 @@ export default function ReportsPage() {
         </select>
       </div>
 
-      {/* Attendance Chart */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Weekly Attendance</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -57,7 +54,6 @@ export default function ReportsPage() {
         </ResponsiveContainer>
       </div>
 
-      {/* Grades Table */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Grades Overview</h2>
         <div className="overflow-x-auto">

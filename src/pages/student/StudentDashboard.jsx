@@ -46,7 +46,6 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-[#e2eaed] text-black-800 font-medium">
-      {/* Navbar */}
       <nav className="no-print bg-[#8f0303] text-white shadow-md px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <h1 className="text-lg font-semibold tracking-wide">
           Pupil's Progress Report Card and Report on Attendance
@@ -76,7 +75,6 @@ export default function StudentDashboard() {
         </div>
       </nav>
 
-      {/* Report Card Section */}
       <div className="p-6">
         <div
           ref={printRef}
@@ -89,7 +87,6 @@ export default function StudentDashboard() {
           }}
         >
 
-          {/* Header */}
           <div className="relative pb-4 mb-6 text-center">
             <img
               src="/wmsu-logo.jpg"
@@ -119,7 +116,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Student Info */}
           <div className="mb-6 text-sm space-y-2">
             <div className="flex items-center">
               <span className="font-semibold mr-2">Name:</span>
@@ -151,7 +147,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Intro */}
           <div className="w-[98%] mx-auto -mt-5">
             <p className="text-sm mb-4 text-justify leading-relaxed">
               <span>Dear Parents,</span>
@@ -165,7 +160,6 @@ export default function StudentDashboard() {
             </p>
           </div>
 
-          {/* Grades Table */}
           <h4 className="font-bold text-center -mt-2 mb-1">
             REPORT ON LEARNING PROGRESS AND ACHIEVEMENT
           </h4>
@@ -222,7 +216,6 @@ export default function StudentDashboard() {
             </table>
           </div>
 
-          {/* Remedial Section */}
           <div className="mt-6">
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-300 text-sm text-center">
@@ -272,7 +265,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Signatures */}
           <div className="mt-12 flex justify-center gap-80 text-center text-sm">
             <div>
               <p className="font-bold underline">MA. NORA D. LAI, Ed.D, JD</p>
@@ -286,7 +278,6 @@ export default function StudentDashboard() {
 
           <hr className="border-gray-900 d mt-15 mb-2" /> 
 
-          {/* ATTENDANCE SECTION */}
           <h2 className="text-xl font-bold text-center mt-12 mb-6">REPORT ON ATTENDANCE</h2>
           <div className="overflow-x-auto">
             <table className="w-full border border-gray-300 text-sm text-center mb-8">
@@ -321,7 +312,6 @@ export default function StudentDashboard() {
             </table>
           </div>
 
-          {/* Parent/Guardian Signature */}
           <div className="mt-10 mb-15 text-center justify-center">
             <h3 className="font-bold text-center mb-4">PARENT / GUARDIAN’S SIGNATURE</h3>
             <div className="space-y-3 text-sm text-center justify-center">
@@ -332,7 +322,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Certificate of Transfer */}
           <div className="mb-10">
             <h3 className="font-bold text-center mt-7 mb-4">Certificate of Transfer</h3>
             <div className="text-sm space-y-2">
@@ -352,7 +341,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Cancellation Section */}
           <div className="text-sm">
             <h3 className="font-bold text-center mb-4">
               Cancellation of Eligibility to Transfer
@@ -360,7 +348,6 @@ export default function StudentDashboard() {
 
             <p>Admitted in: ___________________________</p>
 
-            {/* Align Date and Principal side by side */}
             <div className="flex justify-between items-end mt-2">
               <p>Date: ___________________________</p>
 
@@ -375,7 +362,6 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Hide Navbar and Buttons when printing */}
       <style>{`
         @media print {
           .no-print {

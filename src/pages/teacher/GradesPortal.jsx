@@ -10,6 +10,16 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const printRef = useRef();
 
+  const [studentInfo, setStudentInfo] = useState({
+  name: "",
+  age: "",
+  sex: "",
+  gradeLevel: "",
+  section: "",
+  lrn: "",
+});
+
+
   const [grades, setGrades] = useState([
   { subject: "Filipino", q1: "", q2: "", q3: "", q4: "", final: "", remarks: ""  },
   { subject: "English", q1: "", q2: "", q3: "", q4: "", final: "", remarks: ""  },
@@ -46,7 +56,6 @@ export default function StudentDashboard() {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun"
   ];
 
-  // --- State + Helpers (put above JSX) ---
   const [attendance, setAttendance] = useState({
     schoolDays: Array(10).fill(""),
     daysPresent: Array(10).fill(""),
@@ -63,9 +72,40 @@ export default function StudentDashboard() {
     return absent >= 0 ? absent : 0; 
   };
 
+const handleSaveGrades = () => {
+  if (!studentInfo.lrn || !studentInfo.name) {
+    alert("Please fill out the student's LRN and Name before saving.");
+    return;
+  }
+
+  const finals = grades
+    .map((g) => Number(g.final))
+    .filter((v) => !isNaN(v));
+
+  if (finals.length === 0) {
+    alert("Please complete grades before saving.");
+    return;
+  }
+
+  const generalAverage =
+    finals.reduce((a, b) => a + b, 0) / finals.length;
+
+  const studentData = {
+    ...studentInfo,
+    subjects: grades,
+    generalAverage,
+  };
+
+  const existing = JSON.parse(localStorage.getItem("studentGrades")) || [];
+  const updated = existing.filter((s) => s.lrn !== studentInfo.lrn);
+  updated.push(studentData);
+
+  localStorage.setItem("studentGrades", JSON.stringify(updated));
+  alert("✅ Grades successfully saved!");
+};
+
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 flex items-center justify-between print:hidden">
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <PencilSquareIcon className="w-10 h-10 text-red-800" />
@@ -88,10 +128,16 @@ export default function StudentDashboard() {
             <ArrowDownTrayIcon className="w-5 h-5" />
             Download PDF
           </button>
+
+          <button
+            onClick={handleSaveGrades}
+            className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
+          >
+            Save Grades
+          </button>
         </div>
       </div>
 
-      {/* Report Card Section */}
       <div className="p-6">
         <div
           ref={printRef}
@@ -104,7 +150,6 @@ export default function StudentDashboard() {
           }}
         >
 
-          {/* Header */}
           <div className="relative pb-4 mb-6 text-center">
             <img
               src="/wmsu-logo.jpg"
@@ -123,7 +168,6 @@ export default function StudentDashboard() {
                 Zamboanga City
               </p>
               <h3 className="font-bold mt-2">PUPIL’S PROGRESS REPORT CARD</h3>
-              {/* School Year (Editable) */}
               <div className="flex items-center justify-center mb-4">
                 <span className="text-sm mr-2">
                   School Year 20
@@ -145,13 +189,13 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Student Info (Editable) */}
           <div className="mb-6 text-sm space-y-2">
             <div className="flex items-center">
               <span className="font-semibold mr-2">Name:</span>
               <input
                 type="text"
-                placeholder=""
+                value={studentInfo.name}
+                onChange={(e) => setStudentInfo({ ...studentInfo, name: e.target.value })}
                 className="flex-1 border-b border-gray-900 outline-none bg-transparent"
               />
             </div>
@@ -161,7 +205,8 @@ export default function StudentDashboard() {
                 <span className="font-semibold mr-2">Age:</span>
                 <input
                   type="text"
-                  placeholder=""
+                  value={studentInfo.age}
+                  onChange={(e) => setStudentInfo({ ...studentInfo, age: e.target.value })}
                   className="w-16 border-b border-gray-900 outline-none bg-transparent text-center"
                 />
               </div>
@@ -169,7 +214,8 @@ export default function StudentDashboard() {
                 <span className="font-semibold mr-2">Sex:</span>
                 <input
                   type="text"
-                  placeholder=""
+                  value={studentInfo.sex}
+                  onChange={(e) => setStudentInfo({ ...studentInfo, sex: e.target.value })}
                   className="w-20 border-b border-gray-900 outline-none bg-transparent text-center"
                 />
               </div>
@@ -177,7 +223,8 @@ export default function StudentDashboard() {
                 <span className="font-semibold mr-2">Grade:</span>
                 <input
                   type="text"
-                  placeholder=""
+                  value={studentInfo.gradeLevel}
+                  onChange={(e) => setStudentInfo({ ...studentInfo, gradeLevel: e.target.value })}
                   className="w-24 border-b border-gray-900 outline-none bg-transparent text-center"
                 />
               </div>
@@ -185,7 +232,8 @@ export default function StudentDashboard() {
                 <span className="font-semibold mr-2">Section:</span>
                 <input
                   type="text"
-                  placeholder=""
+                  value={studentInfo.section}
+                  onChange={(e) => setStudentInfo({ ...studentInfo, section: e.target.value })}
                   className="flex-1 border-b border-gray-900 outline-none bg-transparent"
                 />
               </div>
@@ -195,13 +243,13 @@ export default function StudentDashboard() {
               <span className="font-semibold mr-2">LRN:</span>
               <input
                 type="text"
-                placeholder=""
+                value={studentInfo.lrn}
+                onChange={(e) => setStudentInfo({ ...studentInfo, lrn: e.target.value })}
                 className="w-80 border-b border-gray-900 outline-none bg-transparent"
               />
             </div>
           </div>
 
-          {/* Intro */}
           <div className="w-[98%] mx-auto -mt-5">
             <p className="text-sm mb-4 text-justify leading-relaxed">
               <span>Dear Parents,</span>
@@ -215,7 +263,6 @@ export default function StudentDashboard() {
             </p>
           </div>
 
-          {/* Grades Table */}
           <h4 className="text-2xl font-bold text-center -mt-2 mb-1">
             REPORT ON LEARNING PROGRESS AND ACHIEVEMENT
           </h4>
@@ -245,7 +292,6 @@ export default function StudentDashboard() {
                         {g.subject}
                       </td>
 
-                      {/* Editable Quarter Inputs */}
                       {["q1", "q2", "q3", "q4"].map((q) => (
                         <td key={q} className="border border-gray-900 px-2 py-1">
                           <input
@@ -255,7 +301,6 @@ export default function StudentDashboard() {
                               const updated = [...grades];
                               updated[i] = { ...updated[i], [q]: e.target.value };
 
-                              // Compute final grade automatically
                               const { q1, q2, q3, q4 } = updated[i];
                               const quarters = [q1, q2, q3, q4]
                                 .map(Number)
@@ -301,7 +346,6 @@ export default function StudentDashboard() {
                   ))
                 )}
 
-                {/* General Average */}
                 <tr className="bg-gray-100 font-semibold">
                   <td className="border border-gray-900 px-2 py-1"></td>
                   <td colSpan="4" className="border border-gray-900 px-2 py-1 text-center">
@@ -331,7 +375,6 @@ export default function StudentDashboard() {
             </table>
           </div>
 
-          {/* Remedial Section */}
           <div className="mt-6">
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-900 text-sm text-center">
@@ -390,7 +433,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Signatures */}
           <div className="mt-12 flex justify-center gap-80 text-center text-sm">
             <div>
               <p className="font-bold underline">MA. NORA D. LAI, Ed.D, JD</p>
@@ -404,7 +446,6 @@ export default function StudentDashboard() {
 
           <hr className="border-black border-1 d mt-15 mb-2" /> 
 
-          {/* ATTENDANCE SECTION */}
           <h2 className="text-2xl font-bold text-center mt-12 mb-6">REPORT ON ATTENDANCE</h2>
           <div className="overflow-x-auto">
             <table className="w-full border border-gray-900 text-sm text-center mb-8">
@@ -419,7 +460,6 @@ export default function StudentDashboard() {
               </thead>
 
               <tbody>
-                {/* No. of school days */}
                 <tr>
                   <td className="border border-gray-900 px-2 py-1 text-left font-semibold">
                     No. of school days
@@ -443,7 +483,6 @@ export default function StudentDashboard() {
                   </td>
                 </tr>
 
-                {/* No. of days present */}
                 <tr>
                   <td className="border border-gray-900 px-2 py-1 text-left font-semibold">
                     No. of days present
@@ -467,7 +506,6 @@ export default function StudentDashboard() {
                   </td>
                 </tr>
 
-                {/* No. of days absent (auto-computed) */}
                 <tr>
                   <td className="border border-gray-900 px-2 py-1 text-left font-semibold">
                     No. of days absent
@@ -490,7 +528,6 @@ export default function StudentDashboard() {
             </table>
           </div>
 
-          {/* Parent/Guardian Signature */}
           <div className="mt-10 mb-15 text-center justify-center">
             <h3 className="text-2xl font-bold text-center mb-4">PARENT / GUARDIAN’S SIGNATURE</h3>
             <div className="space-y-3 text-sm text-center justify-center">
@@ -501,7 +538,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Certificate of Transfer */}
           <div className="mb-10">
             <h3 className="text-2xl font-bold text-center mt-7 mb-4">Certificate of Transfer</h3>
               <div className="mb-10 text-sm space-y-2">
@@ -542,7 +578,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Cancellation Section */}
           <div className="text-sm">
             <h3 className="text-2xl font-bold text-center mt-7 mb-4">
               Cancellation of Eligibility to Transfer
@@ -556,7 +591,6 @@ export default function StudentDashboard() {
               />
             </div>
 
-            {/* Align Date and Principal side by side */}
             <div className="flex justify-between items-end mt-2">
               <div className="flex items-center gap-x-2">
                 <label>Date:</label>

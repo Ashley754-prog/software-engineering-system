@@ -20,7 +20,6 @@ return (
       style={{ backgroundImage: "url('/wmsu-bg-se.png')" }}
     > 
     <div className="relative bg-white border border-gray-300 rounded-xl shadow-lg w-[740px] p-10 text-center animate-fadeIn">
-    {/* Header */}
     <div className="flex flex-row gap-6 items-center mb-6 justify-center">
       <img
         src="/wmsu-logo.jpg"
@@ -36,7 +35,6 @@ return (
     <hr className="border-gray-400 mb-8" />
 
     <p className="text-sm text-gray-600 mb-3">Create new account first to access the system.</p>
-    {/* Create Account Buttons */}
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[600px] mx-auto mb-8">
       <button
         onClick={() => handleSelectRole("student")}
@@ -63,7 +61,6 @@ return (
       </button>
     </div>
 
-    {/* Login Buttons */}
     <div className="mt-6">
       <p className="text-sm text-gray-600 mb-3 pt-5">Already have an account? Log in as:</p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[600px] mx-auto">

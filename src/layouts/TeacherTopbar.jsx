@@ -17,7 +17,6 @@ export default function TeacherTopbar({ sidebarOpen }) {
         sidebarOpen ? "left-64" : "left-20"
       }`}
     >
-      {/* Left side - Logo and Title */}
       <div className="flex items-center">
         <img
           src="/wmsu-logo.jpg"
@@ -29,12 +28,8 @@ export default function TeacherTopbar({ sidebarOpen }) {
         </h1>
       </div>
 
-      {/* Right side - Icons and Profile */}
       <div className="flex items-center gap-6 relative">
-        {/* Notification Bell */}
         <BellIcon className="w-6 h-6 text-red-800 cursor-pointer hover:scale-110 transition-all" />
-
-        {/* Profile dropdown */}
         <div className="relative">
           <button
             className="flex items-center gap-2"

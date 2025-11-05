@@ -19,12 +19,11 @@ export default function AttendancePage() {
     { id: "202503", name: "Pedro Reyes" },
   ]);
 
-  const [attendanceSheet, setAttendanceSheet] = useState({}); // { studentId: { date: "P"/"A" } }
+  const [attendanceSheet, setAttendanceSheet] = useState({});
 
   const videoRef = useRef(null);
   const totalStudents = students.length;
 
-  // --- QR Check-in ---
   const handleCheckIn = (id) => {
     if (!id) return;
     const newRecord = { id, section, date, time: new Date().toLocaleTimeString() };
@@ -49,7 +48,6 @@ export default function AttendancePage() {
     return () => codeReader.reset();
   }, [scannerOpen]);
 
-  // --- Compute totals ---
   const allDates = Array.from({ length: 5 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (4 - i));
@@ -64,7 +62,6 @@ export default function AttendancePage() {
     return { presentDays, percentage };
   };
 
-  // --- Export to Excel ---
   const handleExportExcel = () => {
     const header = ["Student ID", "Name", ...allDates, "Total Present", "Attendance %"];
     const rows = students.map((s) => {
@@ -80,7 +77,6 @@ export default function AttendancePage() {
     saveAs(blob, `SF2_${section}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
-  // --- Chart Data ---
   const presentCount = attendanceRecords.filter(
     (r) => r.section === section && r.date === date
   ).length;
@@ -95,7 +91,6 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 flex items-center justify-between print:hidden">
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <CalendarDateRangeIcon className="w-10 h-10 text-red-800" />
@@ -110,7 +105,6 @@ export default function AttendancePage() {
         </button>
       </div>
 
-      {/* Input Section */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
         <div className="flex flex-col md:flex-row gap-4 md:items-end">
           <div className="flex-1">
@@ -170,7 +164,6 @@ export default function AttendancePage() {
         )}
       </div>
 
-      {/* Summary */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200 flex justify-around">
         <div className="text-center">
           <h3 className="text-gray-700 font-medium">Section: {section}</h3>
@@ -185,7 +178,6 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      {/* Weekly Chart */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Weekly Attendance</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -199,7 +191,6 @@ export default function AttendancePage() {
         </ResponsiveContainer>
       </div>
 
-      {/* SF2 Editable Table */}
       <div className="bg-white p-6 rounded-xl shadow border border-gray-200 overflow-x-auto">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           SF2-style Attendance Encoding

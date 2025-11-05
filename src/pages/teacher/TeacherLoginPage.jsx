@@ -21,7 +21,6 @@ export default function TeacherLogin() {
       style={{ backgroundImage: "url('/wmsu-bg-se.png')" }}
     >
       <div className="relative bg-white/95 p-10 rounded-2xl shadow-xl w-[420px] h-auto text-center border border-gray-200">
-        {/* Top-right X Button */}
         <button
           onClick={() => navigate("/")}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"

@@ -12,7 +12,6 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
-  // remove useState for sidebarOpen (we now control it from layout)
   const [hoveredItem, setHoveredItem] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +31,6 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
         sidebarOpen ? "w-64" : "w-20"
       }`}
     >
-      {/* Sidebar Header */}
       <div className="px-4 py-5 border-b border-red-700/50 flex items-center">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -42,7 +40,6 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex flex-col mt-2 space-y-1 flex-1">
         {menuItems.map((item) => (
           <div
@@ -79,7 +76,6 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
         ))}
       </nav>
 
-      {/* Bottom Settings */}
       <div
         className="relative px-4 py-4 flex items-center gap-3 hover:bg-red-700 transition-all duration-300 ease-in-out cursor-pointer"
         onMouseEnter={() => setHoveredItem("Settings")}

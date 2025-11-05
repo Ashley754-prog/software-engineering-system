@@ -11,7 +11,7 @@ export default function CustomerServicePage() {
     const newMessage = {
       ...formData,
       date: new Date().toLocaleString(),
-      status: "Pending", // Default status
+      status: "Pending",
     };
     setSubmittedMessages([newMessage, ...submittedMessages]);
     alert("Your message has been sent!");
@@ -45,7 +45,6 @@ export default function CustomerServicePage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 flex items-center justify-between print:hidden">
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ChatBubbleBottomCenterIcon className="w-10 h-10 text-red-800" />
@@ -54,7 +53,6 @@ export default function CustomerServicePage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left: Contact Form */}
         <div className="flex-1 bg-white p-6 rounded-xl shadow border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Send us a message</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -100,9 +98,7 @@ export default function CustomerServicePage() {
           </form>
         </div>
 
-        {/* Right: FAQ + Recent Messages */}
         <div className="flex-1 space-y-6">
-          {/* FAQ */}
           <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">FAQ</h2>
             <div className="space-y-2">
@@ -118,11 +114,9 @@ export default function CustomerServicePage() {
             </div>
           </div>
 
-            {/* Recent Messages */}
             <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Messages</h2>
 
-            {/* Filter Bar */}
             <div className="flex gap-3 mb-4">
                 {["All", "Pending", "In Progress", "Resolved"].map((status) => (
                 <button

@@ -16,21 +16,14 @@ import CustomerService from "./pages/teacher/CustomerService";
 
 function App() {
 return ( <Router> <Routes>
-{/* Redirect root "/" to role selection */}
 <Route path="/" element={<Navigate to="/role-selection" />} />
-
-    {/* Role selection page */}
     <Route path="/role-selection" element={<RoleSelection />} />
-
-    {/* Auth Routes */}
     <Route path="/forgot-password" element={<ForgotPassword />} />
 
-    {/* Student Routes */}
     <Route path="/student/student-login" element={<StudentLoginPage />} />
     <Route path="/student/student-create-account" element={<StudentCreateAccount />} />
     <Route path="/student/student-dashboard" element={<StudentDashboard />} />
 
-    {/* Teacher Layout Routes */}
     <Route path="/teacher/teacher-login" element={<TeacherLoginPage />} />
     <Route path="/teacher/teacher-create-account" element={<TeacherCreateAccount />} />
     <Route element={<TeacherLayout />}>
