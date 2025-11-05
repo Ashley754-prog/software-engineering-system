@@ -13,6 +13,9 @@ import ClassList from "./pages/teacher/ClassList";
 import AttendancePage from "./pages/teacher/AttendancePage";
 import ReportsPage from "./pages/teacher/ReportsPage";
 import CustomerService from "./pages/teacher/CustomerService";
+import AdminCreateAccount from "./pages/admin/AdminCreateAccount";
+import AdminLogin from "./pages/admin/AdminLogin";  
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
 return ( <Router> <Routes>
@@ -34,6 +37,10 @@ return ( <Router> <Routes>
       <Route path="/reports" element={<ReportsPage />} />
       <Route path="/customer-service" element={<CustomerService />} />
     </Route>
+
+    <Route path="/admin/admin-login" element={<AdminLogin />} />
+    <Route path="/admin/admin-create-account" element={<AdminCreateAccount />} />
+    <Route path="/admin/admin-dashboard" element={<AdminDashboard />} />
   </Routes>
 </Router>
 
