@@ -1,65 +1,76 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import RoleSelection from "./pages/auth/RoleSelection";
+import CreateAccount from "./pages/auth/CreateAccount";
+import LoginPage from "./pages/auth/LoginPage";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-import StudentLoginPage from "./pages/student/StudentLoginPage";
-import StudentCreateAccount from "./pages/student/StudentCreateAccount";
-import StudentDashboard from "./pages/student/StudentDashboard";
-import TeacherLayout from "./layouts/TeacherLayout";
-import TeacherLoginPage from "./pages/teacher/TeacherLoginPage";
-import TeacherCreateAccount from "./pages/teacher/TeacherCreateAccount";
+
+import StudentTopbar from "./layouts/student/StudentTopbar.jsx";
+import StudentDashboard from "./pages/student/StudentDashboard.jsx";
+import GradesTable from "./components/student/GradesTable.jsx";  
+import AttendanceCalendar from "./components/student/AttendanceCalendar.jsx";
+import CustomerServicePage from "./pages/student/CustomerServicePage.jsx";
+
+import TeacherLayout from "./layouts/teacher/TeacherLayout";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
-import GradesPortal from "./pages/teacher/GradesPortal";
+import GradeLevel from "./pages/teacher/GradeLevel.jsx";
+import EditGrades from "./pages/teacher/EditGrades.jsx";
 import ClassList from "./pages/teacher/ClassList";
-import AttendancePage from "./pages/teacher/AttendancePage";
+import QRCodePortal from "./pages/teacher/QRCodePortal.jsx";
 import ReportsPage from "./pages/teacher/ReportsPage";
 import CustomerService from "./pages/teacher/CustomerService";
-import AdminLayout from "./layouts/AdminLayout";
-import AdminCreateAccount from "./pages/admin/AdminCreateAccount";
-import AdminLogin from "./pages/admin/AdminLogin";  
+
+import AdminLayout from "./layouts/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTeachers from "./pages/admin/AdminTeachers";
 import AdminStudents from "./pages/admin/AdminStudents";
+import AdminCreateK3 from "./pages/admin/AdminCreateK3.jsx";
 import AdminGrades from "./pages/admin/AdminGrades";
 import AdminClasses from "./pages/admin/AdminClasses";
+import AdminClassList from "./pages/admin/AdminClassList.jsx";
 import AdminAttendance from "./pages/admin/AdminAttendance";
 import AdminReports from "./pages/admin/AdminReports";
 
 function App() {
-return ( <Router> <Routes>
-<Route path="/" element={<Navigate to="/role-selection" />} />
-    <Route path="/role-selection" element={<RoleSelection />} />
-    <Route path="/forgot-password" element={<ForgotPassword />} />
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/create-account" replace />} />
 
-    <Route path="/student/student-login" element={<StudentLoginPage />} />
-    <Route path="/student/student-create-account" element={<StudentCreateAccount />} />
-    <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/create-account" element={<CreateAccount />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-    <Route path="/teacher/teacher-login" element={<TeacherLoginPage />} />
-    <Route path="/teacher/teacher-create-account" element={<TeacherCreateAccount />} />
-    <Route element={<TeacherLayout />}>
-      <Route path="/teacher/teacher-dashboard" element={<TeacherDashboard />} />
-      <Route path="/grades-portal" element={<GradesPortal />} />
-      <Route path="/class-list" element={<ClassList />} />
-      <Route path="/attendance" element={<AttendancePage />} />
-      <Route path="/reports" element={<ReportsPage />} />
-      <Route path="/customer-service" element={<CustomerService />} />
-    </Route>
+        <Route path="/layouts/student/student-topbar" element={<StudentTopbar />} />
+        <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+        <Route path="/student/grades-table" element={<GradesTable />} />
+        <Route path="/student/attendance-calendar" element={<AttendanceCalendar />} />
+        <Route path="/student/customer-service-page" element={<CustomerServicePage />} />
 
-    <Route path="/admin/admin-login" element={<AdminLogin />} />
-    <Route path="/admin/admin-create-account" element={<AdminCreateAccount />} />
-    <Route element={<AdminLayout />}>
-      <Route path="/admin/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/admin-teachers" element={<AdminTeachers />} />
-      <Route path="/admin/admin-students" element={<AdminStudents />} />
-      <Route path="/admin/admin-grades" element={<AdminGrades />} />
-      <Route path="/admin/admin-classes" element={<AdminClasses />} />
-      <Route path="/admin/admin-attendance" element={<AdminAttendance />} />
-      <Route path="/admin/admin-reports" element={<AdminReports />} />
-    </Route>
-  </Routes>
-</Router>
+        <Route element={<TeacherLayout />}>
+          <Route path="/teacher/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route path="/grade-level" element={<GradeLevel />} />
+          <Route path="/edit-grades" element={<EditGrades />} />
+          <Route path="/class-list" element={<ClassList />} />
+          <Route path="/qr-portal" element={<QRCodePortal />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/customer-service" element={<CustomerService />} />
+        </Route>
 
-);
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/admin-teachers" element={<AdminTeachers />} />
+          <Route path="/admin/admin-students" element={<AdminStudents />} />
+          <Route path="/admin/admin/create-k3" element={<AdminCreateK3 />} />
+          <Route path="/admin/admin-grades" element={<AdminGrades />} />
+          <Route path="/admin/admin-classes" element={<AdminClasses />} />
+          <Route path="/admin/admin/classlist/:id" element={<AdminClassList />} />
+          <Route path="/admin/admin-attendance" element={<AdminAttendance />} />
+          <Route path="/admin/admin-reports" element={<AdminReports />} />
+        </Route>
+
+        <Route path="*" element={<div className="p-20 text-center text-3xl font-bold">404 - Page Not Found</div>} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

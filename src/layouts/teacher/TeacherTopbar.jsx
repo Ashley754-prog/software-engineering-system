@@ -6,10 +6,10 @@ export default function TeacherTopbar({ sidebarOpen }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => navigate("/role-selection");
+  const handleLogout = () => navigate("/login");
   const handleMainDashboard = () => navigate("/teacher/teacher-dashboard");
-  const handleGradesPortal = () => navigate("/grades-portal");
-  const handleAttendancePage = () => navigate("/attendance");
+  const handleGradesPortal = () => navigate("/edit-grades");
+  const handleAttendancePage = () => navigate("/qr-portal");
 
   return (
     <header
@@ -36,7 +36,7 @@ export default function TeacherTopbar({ sidebarOpen }) {
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <UserCircleIcon className="w-8 h-8 text-red-800" />
-            <ChevronDownIcon className="w-4 h-4 text-red-800" />
+            <ChevronDownIcon className={`w-4 h-4 text-red-800 transition-transform ${showDropdown ? "rotate-180" : ""}`} />
           </button>
 
           {showDropdown && (
@@ -58,13 +58,13 @@ export default function TeacherTopbar({ sidebarOpen }) {
                   onClick={handleGradesPortal}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
-                  Grades Portal
+                  Edit Grades
                 </li>
                 <li 
                   onClick={handleAttendancePage}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
-                  Students Attendance
+                  QR Code Portal
                 </li>
                 <hr />
                 <li

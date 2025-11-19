@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TeacherSidebar from "../layouts/TeacherSidebar";
-import TeacherTopbar from "../layouts/TeacherTopbar";
+import TeacherSidebar from "./TeacherSidebar";
+import TeacherTopbar from "./TeacherTopbar";
 import { Outlet } from "react-router-dom";
 
 export default function TeacherLayout() {

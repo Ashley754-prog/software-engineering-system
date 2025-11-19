@@ -19,7 +19,7 @@ export default function TeacherDashboard() {
         <div className="bg-gray-50 p-4 rounded-lg text-center shadow border border-gray-300 border-l-red-800 border-l-8 hover:shadow-md transition">
           <UsersIcon className="w-6 h-6 flex mx-auto text-[#8f0303]" />
           <p className="text-sm text-gray-500">Total Students</p>
-          <h3 className="text-2xl font-semibold text-[#b30000]">1,247</h3>
+          <h3 className="text-2xl font-semibold text-[#b30000]">504</h3>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg text-center shadow border border-gray-300 border-l-red-800 border-l-8 hover:shadow-md transition">

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { UsersIcon, BookOpenIcon, ClipboardDocumentListIcon, ChartBarIcon, Cog6ToothIcon} from "@heroicons/react/24/solid";
+import { UsersIcon, BookOpenIcon, ClipboardDocumentListIcon, ChartBarIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
+import AdminTeachers from "./AdminTeachers";
+import AdminStudents from "./AdminStudents";
+import AdminClasses from "./AdminClasses";
+import AdminReports from "./AdminReports";
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
@@ -19,51 +23,31 @@ export default function AdminDashboard() {
           <nav className="space-y-2">
             <button
               onClick={() => setActiveSection("overview")}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                activeSection === "overview"
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50 text-gray-700"
-              }`}
+              className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "overview" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveSection("teachers")}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                activeSection === "teachers"
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50 text-gray-700"
-              }`}
+              className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "teachers" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Manage Teachers
             </button>
             <button
               onClick={() => setActiveSection("students")}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                activeSection === "students"
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50 text-gray-700"
-              }`}
+              className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "students" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Manage Students
             </button>
             <button
               onClick={() => setActiveSection("classes")}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                activeSection === "classes"
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50 text-gray-700"
-              }`}
+              className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "classes" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Manage Classes
             </button>
             <button
               onClick={() => setActiveSection("reports")}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                activeSection === "reports"
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-50 text-gray-700"
-              }`}
+              className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "reports" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Reports & Analytics
             </button>
@@ -107,41 +91,10 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeSection === "teachers" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Manage Teachers</h2>
-              <p className="text-gray-600">
-                Add, edit, or remove teachers here. You can also assign them to classes.
-              </p>
-            </div>
-          )}
-
-          {activeSection === "students" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Manage Students</h2>
-              <p className="text-gray-600">
-                View student data, LRN, and class assignments. You can update their info if needed.
-              </p>
-            </div>
-          )}
-
-          {activeSection === "classes" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Manage Classes</h2>
-              <p className="text-gray-600">
-                Create, edit, or remove classes. Assign students and teachers to sections.
-              </p>
-            </div>
-          )}
-
-          {activeSection === "reports" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Reports & Analytics</h2>
-              <p className="text-gray-600">
-                View attendance summaries, grade distributions, and ranking data.
-              </p>
-            </div>
-          )}
+          {activeSection === "teachers" && <AdminTeachers />}
+          {activeSection === "students" && <AdminStudents />}
+          {activeSection === "classes" && <AdminClasses />}
+          {activeSection === "reports" && <AdminReports />}
         </main>
       </div>
     </div>

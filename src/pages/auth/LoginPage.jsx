@@ -2,16 +2,43 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
-export default function TeacherLogin() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(""); 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email && password) {
-      navigate("/teacher/teacher-dashboard"); 
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in both email and password.");
+      return;
+    }
+
+    const emailLower = email.toLowerCase().trim();
+
+    if (!emailLower.endsWith("@wmsu.edu.ph")) {
+      setError("Please use your official WMSU email (@wmsu.edu.ph)");
+      return;
+    }
+
+    if (emailLower.startsWith("teacher@") || emailLower.includes("teacher")) {
+      console.log("Teacher logged in:", emailLower);
+      navigate("/teacher/teacher-dashboard");
+    } 
+    else if (emailLower.startsWith("student@") || emailLower.includes("student")) {
+      console.log("Student logged in:", emailLower);
+      navigate("/student/student-dashboard");
+    } 
+    else {
+      if (emailLower.includes("prof") || emailLower.includes("instructor") || emailLower.includes("sir") || emailLower.includes("maam")) {
+        navigate("/teacher/teacher-dashboard");
+      } else {
+        navigate("/student/student-dashboard"); 
+      }
     }
   };
 
@@ -23,7 +50,7 @@ export default function TeacherLogin() {
       <div className="relative bg-white/95 p-10 rounded-2xl shadow-xl w-[420px] h-auto text-center border border-gray-200">
         <button
           onClick={() => navigate("/")}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition"
         >
           <XMarkIcon className="w-6 h-6" />
         </button>
@@ -40,12 +67,19 @@ export default function TeacherLogin() {
           Automated Grades Portal and Students Attendance using QR Code
         </h2>
 
+        {error && (
+          <p className="text-red-600 text-sm font-medium mb-4 bg-red-50 px-4 py-2 rounded-md border border-red-200">
+            {error}
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <div>
             <label className="text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
-              className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500"
+              placeholder="teacher@wmsu.edu.ph or student@wmsu.edu.ph"
+              className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -56,7 +90,7 @@ export default function TeacherLogin() {
             <label className="text-sm font-medium text-gray-700">Password</label>
             <input
               type={showPassword ? "text" : "password"}
-              className="w-full mt-1 p-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500"
+              className="w-full mt-1 p-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -72,23 +106,22 @@ export default function TeacherLogin() {
 
           <button
             type="submit"
-            className="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2.5 rounded-md transition"
+            className="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-3 rounded-md transition duration-200 transform hover:scale-105"
           >
             Login
           </button>
         </form>
 
         <div className="flex justify-between text-sm mt-5 text-gray-600">
-          <Link to="/teacher/teacher-login" className="hover:text-gray-800">
+          <Link to="/create-account" className="hover:text-red-800 underline">
             Create an Account
           </Link>
-          <Link to="/forgot-password" className="text-red-800 hover:underline">
+          <Link to="/forgot-password" className="text-red-800 hover:underline font-medium">
             Forgot Password?
           </Link>
         </div>
+
       </div>
     </div>
   );
 }
-
-

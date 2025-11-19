@@ -6,7 +6,7 @@ export default function AdminTopbar({ sidebarOpen }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => navigate("/admin/admin-login");
+  const handleLogout = () => navigate("/login");
   const handleDashboard = () => navigate("/admin/admin-dashboard");
   const handleTeachers = () => navigate("/admin/admin-teachers");
   const handleStudents = () => navigate("/admin/admin-students");

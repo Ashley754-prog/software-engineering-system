@@ -3,6 +3,7 @@ import {
   Bars3Icon,
   Cog6ToothIcon,
   ChartBarIcon,
+  BookOpenIcon,
   ClipboardDocumentCheckIcon,
   ViewColumnsIcon,
   AcademicCapIcon,
@@ -18,9 +19,10 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
 
   const menuItems = [
     { name: "Dashboard", icon: <ChartBarIcon className="w-6 h-6" />, path: "/teacher/teacher-dashboard" },
-    { name: "Grades", icon: <ClipboardDocumentCheckIcon className="w-6 h-6" />, path: "/grades-portal" },
+    { name: "Grade Level", icon: <BookOpenIcon className="w-6 h-6" />, path: "/grade-level" },
+    { name: "Edit Grades", icon: <ClipboardDocumentCheckIcon className="w-6 h-6" />, path: "/edit-grades" },
     { name: "Class List", icon: <ViewColumnsIcon className="w-6 h-6" />, path: "/class-list" },
-    { name: "Attendance", icon: <AcademicCapIcon className="w-6 h-6" />, path: "/attendance" },
+    { name: "QR Code Portal", icon: <AcademicCapIcon className="w-6 h-6" />, path: "/qr-portal" },
     { name: "Reports", icon: <UsersIcon className="w-6 h-6" />, path: "/reports" },
     { name: "Customer Service", icon: <ChatBubbleLeftEllipsisIcon className="w-6 h-6" />, path: "/customer-service" },
   ];

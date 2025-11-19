@@ -1,192 +1,241 @@
-import { useState, useEffect } from "react";
-import { ViewColumnsIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  ViewColumnsIcon,
+} from "@heroicons/react/24/outline";
 
-export default function ClassList() {
-  const [allStudents, setAllStudents] = useState([]);
-  const [query, setQuery] = useState("");
-  const [filteredClasses, setFilteredClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [students, setStudents] = useState([]);
+export default function StudentDashboard() {
+  const [search, setSearch] = useState("");
+  const [gradeFilter, setGradeFilter] = useState("All Grades");
+  const [sectionFilter, setSectionFilter] = useState("All Sections");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [gradeOpen, setGradeOpen] = useState(false);
+const [sectionOpen, setSectionOpen] = useState(false);
+const [statusOpen, setStatusOpen] = useState(false);
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("studentGrades")) || [];
-    setAllStudents(stored);
-  }, []);
 
-  const handleSearch = () => {
-    if (!query.trim()) {
-      setFilteredClasses([]);
-      return;
-    }
-
-    const parts = query.trim().split(" ");
-    const gradeQuery = parts[0];
-    const sectionQuery = parts.slice(1).join(" ");
-
-    const results = allStudents.filter(
-      (s) =>
-        s.gradeLevel.toString().toLowerCase().includes(gradeQuery.toLowerCase()) &&
-        s.section.toLowerCase().includes(sectionQuery.toLowerCase())
-    );
-
-    const uniqueClasses = Array.from(
-      new Set(results.map((r) => `${r.gradeLevel}-${r.section}`))
-    ).map((id, index) => {
-      const [gradeLevel, section] = id.split("-");
-      return { id: index + 1, gradeLevel, section };
-    });
-
-    setFilteredClasses(uniqueClasses);
-  };
-
-  const handleSelectGrade = (grade) => {
-    const sections = Array.from(
-      new Set(
-        allStudents
-          .filter((s) => s.gradeLevel === grade)
-          .map((s) => s.section)
-      )
-    ).map((section, index) => ({ id: index + 1, gradeLevel: grade, section }));
-
-    setFilteredClasses(sections);
-  };
-
-  const handleSelectClass = (gradeLevel, section) => {
-    const storedStudents = JSON.parse(localStorage.getItem("studentGrades")) || [];
-    const classStudents = storedStudents.filter(
-      (s) => s.gradeLevel === gradeLevel && s.section === section
-    );
-
-    const sorted = [...classStudents].sort((a, b) => b.generalAverage - a.generalAverage);
-
-    const ranked = sorted.map((s, i) => ({
-      ...s,
-      rank: i + 1,
-    }));
-
-    setSelectedClass({ gradeLevel, section });
-    setStudents(ranked);
-  };
-
-  const getRankColor = (rank) => {
-    if (rank === 1) return "bg-yellow-100 text-yellow-700 font-semibold";
-    if (rank === 2) return "bg-gray-100 text-gray-700 font-semibold";
-    if (rank === 3) return "bg-orange-100 text-orange-700 font-semibold";
-    return "";
-  };
-
-  const totalClasses = Array.from(new Set(allStudents.map((s) => `${s.gradeLevel}-${s.section}`))).length;
-  const totalStudents = allStudents.length;
+  const students = [
+    {
+      id: 1,
+      name: "John Doe",
+      studentId: "12345",
+      grade: "Grade 3",
+      section: "Wisdom",
+      contact: "0907263553",
+      attendance: "95%",
+      average: 90,
+      status: "Active",
+      avatar: "https://i.pravatar.cc/40?img=1",
+    },
+    {
+      id: 2,
+      name: "Maria Santos",
+      studentId: "12345",
+      grade: "Grade 3",
+      section: "Wisdom",
+      contact: "0907263553",
+      attendance: "96%",
+      average: 80,
+      status: "Active",
+      avatar: "https://i.pravatar.cc/40?img=2",
+    },
+    {
+      id: 3,
+      name: "Juan Pedro",
+      studentId: "12345",
+      grade: "Grade 3",
+      section: "Wisdom",
+      contact: "0907263553",
+      attendance: "96%",
+      average: 80,
+      status: "Active",
+      avatar: "https://i.pravatar.cc/40?img=3",
+    },
+  ];
 
   return (
-    <div className="space-y-6">
+      <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4">
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ViewColumnsIcon className="w-10 h-10 text-red-800" />
-          Class List
+          Manage Students
         </h2>
       </div>
 
-      <div className="bg-white rounded-lg shadow pt-2 pb-3 border border-gray-300">
-      <div className="w-full flex justify-center mt-10">
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-2 flex items-center gap-2 w-3/4 max-w-3xl">
-          <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search by Grade or Section (e.g., 6 LOYALTY)"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400"
-          />
-          <button
-            onClick={handleSearch}
-            className="bg-red-800 text-white px-3 py-1 rounded-md hover:bg-red-900 transition"
-          >
-            Search
-          </button>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-700 font-semibold">Total Students</p>
+              <h2 className="text-2xl font-bold">223</h2>
+            </div>
+            <div className="text-gray-800 text-2xl">👤</div>
+          </div>
+          <p className="text-green-500 text-sm mt-2">↑ 12 from last month</p>
         </div>
-      </div>
 
-      <div className="flex justify-center gap-10 flex-wrap my-4 mt-10 mb-10">
-        <div className="bg-gray-100 p-4 rounded-lg shadow text-center w-80 border-l-red-800 border-l-8">
-          <p className="text-gray-500 text-sm">Total Classes</p>
-          <p className="text-2xl font-bold">{totalClasses}</p>
-        </div>
-        <div className="bg-gray-100 p-4 rounded-lg shadow text-center w-80 border-l-red-800 border-l-8">
-          <p className="text-gray-500 text-sm">Total Students</p>
-          <p className="text-2xl font-bold">{totalStudents}</p>
-        </div>
-      </div>
-      </div>
-
-      {filteredClasses.length > 0 && (
-
-        <div className="flex justify-center mt-4 ml-120">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {filteredClasses.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => handleSelectClass(c.gradeLevel, c.section)}
-                className="bg-white rounded-lg shadow border border-gray-500 p-4 hover:shadow-lg transition text-center justify-center h-20 w-60"
-              >
-                <div className="font-semibold text-gray-800 text-lg">
-                  {c.gradeLevel} - {c.section}
-                </div>
-              </button>
-            ))}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-700 font-semibold">Active Students</p>
+              <h2 className="text-2xl font-bold">220</h2>
+              <p className="text-gray-500 text-sm">97.0% of total</p>
+            </div>
+            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
           </div>
         </div>
-      )}
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-300 overflow-hidden mt-4">
-        <div className="bg-red-800 text-white px-6 py-3 text-lg font-semibold">
-          {selectedClass
-            ? `${selectedClass.gradeLevel} - ${selectedClass.section}`
-            : "Select a class to view students"}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-700 font-semibold">Average Grade</p>
+              <h2 className="text-2xl font-bold">95</h2>
+            </div>
+            <div className="text-gray-800 text-2xl">🏅</div>
+          </div>
+          <p className="text-green-500 text-sm mt-2">↑ 2.3% improvement</p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-center">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold border-b">
-              <tr>
-                <th className="px-3 py-2 border">Rank</th>
-                <th className="px-3 py-2 border">LRN</th>
-                <th className="px-3 py-2 border text-left">Name</th>
-                <th className="px-3 py-2 border">Grade</th>
-                <th className="px-3 py-2 border">Section</th>
-                <th className="px-3 py-2 border">General Average</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.length > 0
-                ? students.map((s) => (
-                    <tr
-                      key={s.lrn}
-                      className={`${getRankColor(s.rank)} hover:bg-gray-50`}
-                    >
-                      <td className="border px-3 py-2">{s.rank}</td>
-                      <td className="border px-3 py-2">{s.lrn}</td>
-                      <td className="border px-3 py-2 text-left">{s.name}</td>
-                      <td className="border px-3 py-2">{s.gradeLevel}</td>
-                      <td className="border px-3 py-2">{s.section}</td>
-                      <td className="border px-3 py-2 font-semibold">{s.generalAverage.toFixed(2)}</td>
-                    </tr>
-                  ))
-                :
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i}>
-                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
-                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
-                      <td className="border px-3 py-2 text-left text-gray-400 italic">-</td>
-                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
-                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
-                      <td className="border px-3 py-2 text-gray-400 italic">-</td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-700 font-semibold">Attendance Rate</p>
+              <h2 className="text-2xl font-bold">92</h2>
+            </div>
+            <div className="text-gray-800 text-2xl">📊</div>
+          </div>
+          <p className="text-gray-500 text-sm mt-2">This month</p>
+        </div>
+      </div>
+
+    <div className="bg-white p-4 rounded-xl flex flex-col md:flex-row gap-4 items-center">
+      <input
+        type="text"
+        placeholder="Search by name, LRN, email..."
+        className="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:ring-1 focus:ring-red-600"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <div className="relative w-48">
+        <select
+          value={gradeFilter}
+          onChange={(e) => setGradeFilter(e.target.value)}
+          onFocus={() => setGradeOpen(true)}
+          onBlur={() => setGradeOpen(false)}
+          className="w-full border border-gray-300 rounded-xl px-4 py-3 appearance-none"
+        >
+          <option>All Grades</option>
+          <option>Grade 1</option>
+          <option>Grade 2</option>
+          <option>Grade 3</option>
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+          <svg
+            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+              gradeOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="relative w-48">
+        <select
+          value={sectionFilter}
+          onChange={(e) => setSectionFilter(e.target.value)}
+          onFocus={() => setSectionOpen(true)}
+          onBlur={() => setSectionOpen(false)}
+          className="w-full border border-gray-300 rounded-xl px-4 py-3 appearance-none"
+        >
+          <option>All Sections</option>
+          <option>Section A</option>
+          <option>Section B</option>
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+          <svg
+            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+              sectionOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="relative w-48">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          onFocus={() => setStatusOpen(true)}
+          onBlur={() => setStatusOpen(false)}
+          className="w-full border border-gray-300 rounded-xl px-4 py-3 appearance-none"
+        >
+          <option>All Status</option>
+          <option>Active</option>
+          <option>Inactive</option>
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+          <svg
+            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+              statusOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
     </div>
+
+
+    <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Student</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Student ID</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Grade & Section</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Contact</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Attendance</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Average</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {students.map((student) => (
+            <tr key={student.id}>
+              <td className="px-6 py-4 flex items-center gap-3">
+                <img className="w-8 h-8 rounded-full" src={student.avatar} alt="" />
+                <span>{student.name}</span>
+              </td>
+              <td className="px-6 py-4">{student.studentId}</td>
+              <td className="px-6 py-4">{student.grade} {student.section}</td>
+              <td className="px-6 py-4">{student.contact}</td>
+              <td className="px-6 py-4">{student.attendance}</td>
+              <td className="px-6 py-4">{student.average}</td>
+              <td className="px-6 py-4">{student.status}</td>
+              <td className="px-6 py-4 flex items-center gap-2">
+                <button className="text-blue-500"><EyeIcon className="w-5 h-5" /></button>
+                <button className="text-green-500"><PencilSquareIcon className="w-5 h-5" /></button>
+                <button className="text-red-500"><TrashIcon className="w-5 h-5" /></button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
   );
 }
