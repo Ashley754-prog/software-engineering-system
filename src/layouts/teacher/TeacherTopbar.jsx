@@ -8,6 +8,7 @@ export default function TeacherTopbar({ sidebarOpen }) {
 
   const handleLogout = () => navigate("/login");
   const handleMainDashboard = () => navigate("/teacher/teacher-dashboard");
+  const handleProfile = () => navigate("/teacher/teacher-profile");
   const handleGradesPortal = () => navigate("/edit-grades");
   const handleAttendancePage = () => navigate("/qr-portal");
 
@@ -51,7 +52,10 @@ export default function TeacherTopbar({ sidebarOpen }) {
                 >
                   Dashboard
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li 
+                  onClick={handleProfile}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
                   Profile
                 </li>
                 <li 

@@ -17,6 +17,7 @@ import ClassList from "./pages/teacher/ClassList";
 import QRCodePortal from "./pages/teacher/QRCodePortal.jsx";
 import ReportsPage from "./pages/teacher/ReportsPage";
 import CustomerService from "./pages/teacher/CustomerService";
+import TeacherProfile from "./pages/teacher/TeacherProfile";
 
 import AdminLayout from "./layouts/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -47,6 +48,7 @@ function App() {
 
         <Route element={<TeacherLayout />}>
           <Route path="/teacher/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route path="/teacher/teacher-profile" element={<TeacherProfile />} />
           <Route path="/grade-level" element={<GradeLevel />} />
           <Route path="/edit-grades" element={<EditGrades />} />
           <Route path="/class-list" element={<ClassList />} />
