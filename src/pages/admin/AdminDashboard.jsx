@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { UsersIcon, BookOpenIcon, ClipboardDocumentListIcon, ChartBarIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import AdminTeachers from "./AdminTeachers";
+import { useNavigate } from "react-router-dom";
 import AdminStudents from "./AdminStudents";
 import AdminClasses from "./AdminClasses";
 import AdminReports from "./AdminReports";
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-8">
@@ -32,6 +34,12 @@ export default function AdminDashboard() {
               className={`w-full text-left px-4 py-2 rounded-lg ${activeSection === "teachers" ? "bg-blue-500 text-white" : "hover:bg-blue-50 text-gray-700"}`}
             >
               Manage Teachers
+            </button>
+            <button
+              onClick={() => navigate("/admin/create-teacher")}
+              className="w-full text-left mt-1 px-4 py-2 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50"
+            >
+              + Create Teacher Account
             </button>
             <button
               onClick={() => setActiveSection("students")}

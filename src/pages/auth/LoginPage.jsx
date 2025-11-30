@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { authService } from "../../api/userService";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(""); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -25,20 +28,33 @@ export default function LoginPage() {
       return;
     }
 
-    if (emailLower.startsWith("teacher@") || emailLower.includes("teacher")) {
-      console.log("Teacher logged in:", emailLower);
-      navigate("/teacher/teacher-dashboard");
-    } 
-    else if (emailLower.startsWith("student@") || emailLower.includes("student")) {
-      console.log("Student logged in:", emailLower);
-      navigate("/student/student-dashboard");
-    } 
-    else {
-      if (emailLower.includes("prof") || emailLower.includes("instructor") || emailLower.includes("sir") || emailLower.includes("maam")) {
+    try {
+      setIsSubmitting(true);
+
+      const response = await authService.login({
+        email: emailLower,
+        password,
+      });
+
+      const user = response?.data?.user;
+      const role = user?.role?.toLowerCase();
+
+      if (!role) {
+        setError("Login succeeded but no role was returned.");
+        return;
+      }
+
+      if (role === "admin") {
+        navigate("/admin/admin-dashboard");
+      } else if (role === "teacher") {
         navigate("/teacher/teacher-dashboard");
       } else {
-        navigate("/student/student-dashboard"); 
+        navigate("/student/student-dashboard");
       }
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,9 +122,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-3 rounded-md transition duration-200 transform hover:scale-105"
+            disabled={isSubmitting}
+            className={`w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-3 rounded-md transition duration-200 transform hover:scale-105 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
           >
-            Login
+            {isSubmitting ? "Logging in..." : "Login"}
           </button>
         </form>
 

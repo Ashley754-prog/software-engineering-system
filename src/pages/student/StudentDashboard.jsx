@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Download, Calendar, BookOpen } from 'lucide-react';
+import authService from '../../api/userService';
 
 const StudentPortal = () => {
   const [activeTab, setActiveTab] = useState('grades');
-  
+  const navigate = useNavigate();
 
   const gradesData = [
     { subject: 'Mathematics', teacher: 'Ms. Santos', grade: '92', remarks: 'Passed' },
@@ -51,19 +53,30 @@ const StudentPortal = () => {
     a.click();
   };
 
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="bg-gradient-to-r from-red-900 to-red-800 text-white rounded-lg p-6 mb-6 shadow-lg">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center">
               <BookOpen className="w-12 h-12 text-red-900" />
             </div>
-            <div>
+            <div className="flex-1">
               <h2 className="text-2xl font-bold">Grade 3 - Wisdom</h2>
               <p className="text-red-100">Student Name: Juan Dela Cruz</p>
               <p className="text-red-100">Student ID: 2024-00123</p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="bg-white text-red-900 font-semibold px-4 py-2 rounded-md shadow-sm hover:bg-red-50 transition"
+            >
+              Logout
+            </button>
           </div>
         </div>
 

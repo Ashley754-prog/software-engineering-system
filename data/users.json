@@ -1,0 +1,42 @@
+[
+  {
+    "id": "2cf13732-e38f-4164-9cc1-f99ac78bee04",
+    "firstName": "collen",
+    "lastName": "cuento",
+    "username": "collen14",
+    "role": "student",
+    "email": "collen@wmsu.edu.ph",
+    "password": "$2a$12$kz1xLgCXJKEmLw7E5E.KJ.XC9liiizvnFhUJUEuMtY3Gtoyw/Vubq",
+    "createdAt": "2025-11-30T03:19:51.442Z"
+  },
+  {
+    "id": "ecabc35e-fbb6-4b86-8c74-7bd303df1510",
+    "firstName": "collen",
+    "lastName": "cuento",
+    "username": "Collen14",
+    "role": "student",
+    "email": "collencuento@wmsu.edu.ph",
+    "password": "$2a$12$8xg2wLlb9J6oBWzlZYmaq.EVeV62R9Xa.P1j2wNC8FETawj0YYDC6",
+    "createdAt": "2025-11-30T03:21:54.495Z"
+  },
+  {
+    "id": "243fba7f-36e2-4e72-962b-7e530b3c81d2",
+    "firstName": "System",
+    "lastName": "Admin",
+    "username": "admin1",
+    "role": "admin",
+    "email": "admin1@wmsu.edu.ph",
+    "password": "$2a$12$e2ZP.m/aHfiww7NlosqDhu9URwQ46lxKlNkKfDhstoQ1OGky69sWG",
+    "createdAt": "2025-11-30T03:56:37.953Z"
+  },
+  {
+    "id": "bb408e06-e061-4c2d-a522-a4ed512beeb8",
+    "firstName": "maria",
+    "lastName": "mercedes",
+    "username": "maria123",
+    "role": "teacher",
+    "email": "maria@wmsu.edu.ph",
+    "password": "$2a$12$71npdaaN2rJOBlG/n41GSecq3s.TB7BOoaVnetY27DDwDtklMugva",
+    "createdAt": "2025-11-30T07:10:39.904Z"
+  }
+]

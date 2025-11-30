@@ -29,6 +29,7 @@ import AdminClasses from "./pages/admin/AdminClasses";
 import AdminClassList from "./pages/admin/AdminClassList.jsx";
 import AdminAttendance from "./pages/admin/AdminAttendance";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminCreateTeacher from "./pages/admin/AdminCreateTeacher.jsx";
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
           <Route path="/admin/admin/classlist/:id" element={<AdminClassList />} />
           <Route path="/admin/admin-attendance" element={<AdminAttendance />} />
           <Route path="/admin/admin-reports" element={<AdminReports />} />
+          <Route path="/admin/create-teacher" element={<AdminCreateTeacher />} />
         </Route>
 
         <Route path="*" element={<div className="p-20 text-center text-3xl font-bold">404 - Page Not Found</div>} />

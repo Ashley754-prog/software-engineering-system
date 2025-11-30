@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { authService } from "../../api/userService";
+import { toast } from 'react-toastify';
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -24,13 +26,14 @@ export default function CreateAccount() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -51,16 +54,35 @@ export default function CreateAccount() {
       return;
     }
 
-    console.log("Account Created:", { ...formData, role });
-    setSuccess(`${role} account created successfully! Redirecting...`);
+    try {
+      setIsSubmitting(true);
+      
+      // Prepare user data for the API
+      const userData = {
+        ...formData,
+        role: role.toLowerCase()
+      };
 
-    setTimeout(() => {
-      if (role === "Student") {
-        navigate("/student/student-dashboard");
-      } else if (role === "Teacher") {
-        navigate("/teacher/teacher-dashboard");
-      }
-    }, 1200);
+      // Call the registration API
+      const response = await authService.register(userData);
+      
+      setSuccess(`${role} account created successfully! Redirecting...`);
+      
+      // Redirect based on role after successful registration
+      setTimeout(() => {
+        if (role === "Student") {
+          navigate("/student/student-dashboard");
+        } else if (role === "Teacher") {
+          navigate("/teacher/teacher-dashboard");
+        }
+      }, 1200);
+      
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -190,9 +212,10 @@ export default function CreateAccount() {
           <div className="flex justify-center space-x-3 mt-8">
             <button
               type="submit"
-              className="bg-red-800 hover:bg-red-700 text-white font-semibold py-2.5 px-6 rounded-md"
+              disabled={isSubmitting}
+              className={`w-full bg-red-800 text-white py-2 px-4 rounded-md hover:bg-red-900 transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-opacity-50 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              Create New Account
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
             <button
               type="button"
