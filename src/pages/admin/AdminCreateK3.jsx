@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import QRCode from 'qrcode';
+import authService from "../../api/userService";
 
 export default function AdminCreateK3() {
   const [formData, setFormData] = useState({
@@ -88,6 +89,22 @@ export default function AdminCreateK3() {
       const result = await response.json();
 
       if (response.ok) {
+        // Also create a login-capable auth user with role 'student'
+        try {
+          await authService.register({
+            email: formData.wmsuEmail,
+            password: formData.password,
+            confirmPassword: formData.password,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            username: formData.lrn,
+            role: "student",
+          });
+        } catch (err) {
+          // Do not block student creation if auth user creation fails
+          console.error("Failed to create auth user for student:", err);
+        }
+
         alert(`Student account created successfully!\n\nEmail: ${formData.wmsuEmail}\nPassword: ${formData.password}\n\nPlease save this password!`);
         
         setFormData({

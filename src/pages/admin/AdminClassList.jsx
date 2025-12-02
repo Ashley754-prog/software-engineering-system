@@ -1,41 +1,36 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { UsersIcon } from "@heroicons/react/24/solid";
 
 export default function AdminClassList() {
-  const { id } = useParams(); 
+  const { id } = useParams();
+  const location = useLocation();
+  const { grade, section } = location.state || {};
 
-  const classInfo = {
-    grade: "Grade 2",
-    section: "Section B",
-  };
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const students = [
-    {
-      id: 1,
-      name: "Juan Dela Cruz",
-      lrn: "123456789012",
-      sex: "Male",
-      grade: "Grade 2",
-      section: "B",
-    },
-    {
-      id: 2,
-      name: "Maria Santos",
-      lrn: "987654321098",
-      sex: "Female",
-      grade: "Grade 2",
-      section: "B",
-    },
-    {
-      id: 3,
-      name: "Mark Rivera",
-      lrn: "112233445566",
-      sex: "Male",
-      grade: "Grade 2",
-      section: "B",
-    },
-  ];
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/students");
+        const data = await response.json();
+        setStudents(data || []);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const classStudents = students.filter(
+    (s) =>
+      (s.gradeLevel === grade || s.grade === grade) &&
+      s.section === section
+  );
 
   return (
     <div className="space-y-8">
@@ -43,7 +38,7 @@ export default function AdminClassList() {
         <div className="flex items-center gap-4 mb-4">
           <UsersIcon className="w-16 h-16 text-red-800" />
           <h2 className="text-4xl font-bold text-gray-900">
-            {classInfo.grade} – {classInfo.section} Class List
+            {grade && section ? `${grade} – ${section} Class List` : "Class List"}
           </h2>
         </div>
         <p className="text-gray-600">Showing all students enrolled in this class.</p>
@@ -63,12 +58,26 @@ export default function AdminClassList() {
           </thead>
 
           <tbody>
-            {students.map((student) => (
-              <tr key={student.id} className="hover:bg-gray-50">
-                <td className="p-3 border-b">{student.name}</td>
+            {loading && (
+              <tr>
+                <td className="p-3 border-b text-gray-600" colSpan={6}>
+                  Loading students...
+                </td>
+              </tr>
+            )}
+            {!loading && classStudents.length === 0 && (
+              <tr>
+                <td className="p-3 border-b text-gray-600" colSpan={6}>
+                  No students found for this class.
+                </td>
+              </tr>
+            )}
+            {!loading && classStudents.map((student) => (
+              <tr key={student.id || student.lrn} className="hover:bg-gray-50">
+                <td className="p-3 border-b">{student.fullName || student.name}</td>
                 <td className="p-3 border-b">{student.lrn}</td>
                 <td className="p-3 border-b">{student.sex}</td>
-                <td className="p-3 border-b">{student.grade}</td>
+                <td className="p-3 border-b">{student.gradeLevel || student.grade}</td>
                 <td className="p-3 border-b">{student.section}</td>
 
                 <td className="p-3 border-b text-center space-x-2">
@@ -77,9 +86,6 @@ export default function AdminClassList() {
                   </button>
                   <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-400">
                     Edit
-                  </button>
-                  <button className="px-3 py-1 bg-red-700 text-white rounded hover:bg-red-600">
-                    Remove
                   </button>
                 </td>
               </tr>

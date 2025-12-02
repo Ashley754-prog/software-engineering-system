@@ -37,6 +37,16 @@ export const authService = {
     }
   },
 
+  // Update current user
+  updateCurrentUser: async (updates) => {
+    try {
+      const response = await api.patch('/users/me', updates);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update user data' };
+    }
+  },
+
   // Logout user
   logout: () => {
     localStorage.removeItem('token');

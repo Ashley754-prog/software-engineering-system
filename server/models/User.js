@@ -47,6 +47,35 @@ class User {
   static async comparePassword(candidatePassword, hashedPassword) {
     return bcrypt.compare(candidatePassword, hashedPassword);
   }
+
+  static async updateById(id, updates) {
+    const users = readUsers();
+    const index = users.findIndex((user) => user.id === id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    const currentUser = users[index];
+
+    const { password, id: _ignoredId, createdAt, ...allowedUpdates } = updates;
+
+    const updatedUser = {
+      ...currentUser,
+      ...allowedUpdates,
+    };
+
+    users[index] = updatedUser;
+
+    const success = writeUsers(users);
+
+    if (!success) {
+      throw new Error('Failed to update user');
+    }
+
+    const { password: _removedPassword, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  }
 }
 
 module.exports = User;

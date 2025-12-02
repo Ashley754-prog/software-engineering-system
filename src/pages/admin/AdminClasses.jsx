@@ -1,18 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BuildingLibraryIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminClasses() {
   const navigate = useNavigate();
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const classesData = [
-    { id: 1, grade: "Grade 1", section: "Section A", students: 30 },
-    { id: 2, grade: "Grade 1", section: "Section B", students: 28 },
-    { id: 3, grade: "Grade 2", section: "Section A", students: 32 },
-    { id: 4, grade: "Grade 2", section: "Section B", students: 29 },
-    { id: 5, grade: "Grade 3", section: "Section A", students: 31 },
-    { id: 6, grade: "Grade 3", section: "Section B", students: 27 },
-  ];
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/students");
+        const data = await response.json();
+        setStudents(data || []);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const classMap = new Map();
+
+  students.forEach((s) => {
+    const grade = s.gradeLevel || s.grade || "";
+    const section = s.section || "";
+    if (!grade || !section) return;
+
+    const key = `${grade}__${section}`;
+    if (!classMap.has(key)) {
+      classMap.set(key, {
+        id: key,
+        grade,
+        section,
+        students: 0,
+      });
+    }
+    const cls = classMap.get(key);
+    cls.students += 1;
+  });
+
+  const classesData = Array.from(classMap.values());
 
   return (
     <div className="space-y-8">
@@ -32,7 +63,7 @@ export default function AdminClasses() {
       <div className="grid grid-cols-3 gap-6">
         <div className="bg-red-50 rounded-lg p-4 border border-red-100 text-center">
           <h3 className="text-lg font-semibold text-red-800">Total Classes</h3>
-          <p className="text-2xl font-bold">25</p>
+          <p className="text-2xl font-bold">{classesData.length}</p>
         </div>
 
         <div className="bg-red-50 rounded-lg p-4 border border-red-100 text-center">
@@ -50,7 +81,13 @@ export default function AdminClasses() {
         <h3 className="text-2xl font-bold mb-4 text-gray-800">Class Sections</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {classesData.map((cls) => (
+          {loading && (
+            <div className="text-gray-600 col-span-full">Loading classes...</div>
+          )}
+          {!loading && classesData.length === 0 && (
+            <div className="text-gray-600 col-span-full">No classes found.</div>
+          )}
+          {!loading && classesData.map((cls) => (
             <div
               key={cls.id}
               className="bg-white p-5 rounded-xl border shadow hover:shadow-md transition cursor-pointer"
@@ -63,7 +100,11 @@ export default function AdminClasses() {
               </p>
 
               <button
-                onClick={() => navigate(`/admin/admin/classlist/${cls.id}`)}
+                onClick={() =>
+                  navigate(`/admin/admin/classlist/${encodeURIComponent(cls.id)}`, {
+                    state: { grade: cls.grade, section: cls.section },
+                  })
+                }
                 className="mt-4 w-full bg-red-800 text-white py-2 rounded-lg hover:bg-red-700 transition"
               >
                 View Class List

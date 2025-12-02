@@ -13,4 +13,7 @@ router.use(authController.protect);
 // Get current user
 router.get('/me', userController.getMe);
 
+// Update current user
+router.patch('/me', userController.updateMe);
+
 module.exports = router;

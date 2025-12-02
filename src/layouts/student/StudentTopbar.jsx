@@ -8,7 +8,7 @@ import {
   ChevronDownIcon 
 } from "@heroicons/react/24/solid";
 
-export default function StudentTopbar({ studentName }) {
+export default function StudentTopbar({ studentName, gradeLevel, lrn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -19,6 +19,11 @@ export default function StudentTopbar({ studentName }) {
 
   const handleCustomerService = () => {
     navigate("/student/customer-service-page");
+    setDropdownOpen(false);
+  };
+
+  const handleProfileSettings = () => {
+    navigate("/student/student-profile");
     setDropdownOpen(false);
   };
 
@@ -50,7 +55,10 @@ export default function StudentTopbar({ studentName }) {
             <UserCircleIcon className="w-10 h-10" />
             <div className="text-left">
               <p className="font-semibold text-sm">{studentName || "Student"}</p>
-              <p className="text-xs opacity-90">Grade 1</p>
+              <p className="text-xs opacity-90">{gradeLevel || "Student"}</p>
+              {lrn && (
+                <p className="text-[10px] opacity-80">LRN: {lrn}</p>
+              )}
             </div>
             <ChevronDownIcon className={`w-5 h-5 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
           </button>
@@ -75,6 +83,14 @@ export default function StudentTopbar({ studentName }) {
                   >
                     <HomeModernIcon className="w-5 h-5 text-blue-600" />
                     <span className="font-medium">Portal</span>
+                  </li>
+
+                  <li
+                    onClick={handleProfileSettings}
+                    className="flex items-center gap-3 px-5 py-4 hover:bg-gray-100 cursor-pointer transition"
+                  >
+                    <UserCircleIcon className="w-5 h-5 text-blue-600" />
+                    <span className="font-medium">Profile Settings</span>
                   </li>
 
                   <li

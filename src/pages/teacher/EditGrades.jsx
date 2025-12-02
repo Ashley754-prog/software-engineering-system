@@ -16,7 +16,9 @@ export default function EditGrades() {
   const [selectedSubject, setSelectedSubject] = useState("Mathematics");
   const [selectedQuarter, setSelectedQuarter] = useState("All Quarters");
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState("All Grades");
+  const [selectedSection, setSelectedSection] = useState("All Sections");
+
   // Modal state
   const [showGradeModal, setShowGradeModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -135,11 +137,24 @@ export default function EditGrades() {
     }
   };
 
-  // Filter students
-  const filteredStudents = students.filter(student => 
-    student.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.lrn.includes(searchQuery)
-  );
+  // Filter students by grade level, section, and search query
+  const filteredStudents = students.filter(student => {
+    const matchesGrade =
+      selectedGradeLevel === "All Grades" ||
+      student.gradeLevel === selectedGradeLevel;
+
+    const matchesSection =
+      selectedSection === "All Sections" ||
+      student.section === selectedSection;
+
+    const query = searchQuery.toLowerCase();
+    const matchesSearch =
+      !query ||
+      student.fullName.toLowerCase().includes(query) ||
+      student.lrn.includes(searchQuery);
+
+    return matchesGrade && matchesSection && matchesSearch;
+  });
 
   // Calculate class statistics
   const classAverage = students.length > 0
@@ -221,7 +236,11 @@ export default function EditGrades() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-            <select className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+            <select
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              value={selectedGradeLevel}
+              onChange={(e) => setSelectedGradeLevel(e.target.value)}
+            >
               <option>All Grades</option>
               <option>Kindergarten</option>
               <option>Grade 1</option>
@@ -232,7 +251,11 @@ export default function EditGrades() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Section</label>
-            <select className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500">
+            <select
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              value={selectedSection}
+              onChange={(e) => setSelectedSection(e.target.value)}
+            >
               <option>All Sections</option>
               <option>Love</option>
               <option>Humility</option>

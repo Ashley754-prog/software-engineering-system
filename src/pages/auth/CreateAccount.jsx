@@ -20,6 +20,8 @@ export default function CreateAccount() {
     email: "",
     password: "",
     confirmPassword: "",
+    gradeLevel: "",
+    section: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +50,13 @@ export default function CreateAccount() {
       return;
     }
 
+    if (role === "Student") {
+      if (!formData.gradeLevel || !formData.section) {
+        setError("Please select your grade level and section.");
+        return;
+      }
+    }
+
     const captchaChecked = document.getElementById("captcha")?.checked;
     if (!captchaChecked) {
       setError("Please verify that you are not a robot.");
@@ -65,7 +74,44 @@ export default function CreateAccount() {
 
       // Call the registration API
       const response = await authService.register(userData);
-      
+
+      if (role === "Student") {
+        try {
+          const studentPayload = {
+            lrn: formData.username,
+            firstName: formData.firstName,
+            middleName: "",
+            lastName: formData.lastName,
+            age: "",
+            sex: "",
+            gradeLevel: formData.gradeLevel,
+            section: formData.section,
+            contact: "",
+            wmsuEmail: formData.email,
+            password: formData.password,
+            profilePic: ""
+          };
+
+          const studentRes = await fetch('http://localhost:3001/api/students', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentPayload)
+          });
+
+          if (studentRes.ok) {
+            const lookupRes = await fetch(`http://localhost:3001/api/students/by-email?email=${encodeURIComponent(formData.email)}`);
+            if (lookupRes.ok) {
+              const student = await lookupRes.json();
+              if (student?.id) {
+                localStorage.setItem('studentId', String(student.id));
+              }
+            }
+          }
+        } catch (studentErr) {
+          console.error('Failed to create linked student record:', studentErr);
+        }
+      }
+
       setSuccess(`${role} account created successfully! Redirecting...`);
       
       // Redirect based on role after successful registration
@@ -150,6 +196,44 @@ export default function CreateAccount() {
               className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500"
             />
           </div>
+
+          {role === "Student" && (
+            <>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Grade Level</label>
+                <select
+                  name="gradeLevel"
+                  value={formData.gradeLevel}
+                  onChange={handleChange}
+                  required={role === "Student"}
+                  className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500 bg-white"
+                >
+                  <option value="">Select grade level</option>
+                  <option value="Kinder">Kinder</option>
+                  <option value="Grade 1">Grade 1</option>
+                  <option value="Grade 2">Grade 2</option>
+                  <option value="Grade 3">Grade 3</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Section</label>
+                <select
+                  name="section"
+                  value={formData.section}
+                  onChange={handleChange}
+                  required={role === "Student"}
+                  className="w-full mt-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500 bg-white"
+                >
+                  <option value="">Select section</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+            </>
+          )}
 
           <div>
             <label className="text-sm font-medium text-gray-700">Email</label>

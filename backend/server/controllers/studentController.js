@@ -164,4 +164,23 @@ const deleteStudent = async (req, res) => {
   }
 };
 
-module.exports = { createStudent, getAllStudents, getStudentById, updateStudent, deleteStudent };
+const getStudentByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const [rows] = await pool.query('SELECT * FROM students WHERE wmsu_email = ?', [email]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.json(formatStudent(rows[0]));
+  } catch (err) {
+    console.error('getStudentByEmail error:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};
+
+module.exports = { createStudent, getAllStudents, getStudentById, updateStudent, deleteStudent, getStudentByEmail };

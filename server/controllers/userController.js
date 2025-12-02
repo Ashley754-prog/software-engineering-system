@@ -59,3 +59,37 @@ exports.getMe = async (req, res) => {
     });
   }
 };
+
+exports.updateMe = async (req, res) => {
+  try {
+    const allowedFields = ['firstName', 'lastName', 'username', 'email', 'department', 'position', 'subjects', 'bio', 'profilePic'];
+    const updates = {};
+
+    allowedFields.forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        updates[field] = req.body[field];
+      }
+    });
+
+    const updatedUser = await User.updateById(req.user.id, updates);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'User not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};

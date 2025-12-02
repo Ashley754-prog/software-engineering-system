@@ -48,6 +48,20 @@ export default function LoginPage() {
         navigate("/admin/admin-dashboard");
       } else if (role === "teacher") {
         navigate("/teacher/teacher-dashboard");
+      } else if (role === "student") {
+        try {
+          const res = await fetch(`http://localhost:3001/api/students/by-email?email=${encodeURIComponent(emailLower)}`);
+          if (res.ok) {
+            const student = await res.json();
+            if (student?.id) {
+              localStorage.setItem("studentId", String(student.id));
+            }
+          }
+        } catch (fetchErr) {
+          console.error("Failed to fetch student by email:", fetchErr);
+        }
+
+        navigate("/student/student-dashboard");
       } else {
         navigate("/student/student-dashboard");
       }

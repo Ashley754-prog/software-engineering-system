@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   UserCircleIcon,
   UsersIcon,
@@ -6,6 +7,46 @@ import {
 } from "@heroicons/react/24/solid";
 
 export default function TeacherDashboard() {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/students");
+        const data = await res.json();
+        setStudents(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load students for teacher dashboard:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const totalStudents = students.length;
+
+  const activeClasses = (() => {
+    const set = new Set();
+    students.forEach((s) => {
+      if (s.gradeLevel && s.section) {
+        set.add(`${s.gradeLevel}|||${s.section}`);
+      }
+    });
+    return set.size;
+  })();
+
+  const averageAttendance = (() => {
+    if (!students.length) return 0;
+    const sum = students.reduce(
+      (acc, s) => acc + (typeof s.attendance === "number" ? s.attendance : 0),
+      0
+    );
+    return sum / students.length;
+  })();
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg shadow p-5 border border-gray-300 border-b-red-800 border-b-4">
@@ -19,19 +60,25 @@ export default function TeacherDashboard() {
         <div className="bg-gray-50 p-4 rounded-lg text-center shadow border border-gray-300 border-l-red-800 border-l-8 hover:shadow-md transition">
           <UsersIcon className="w-6 h-6 flex mx-auto text-[#8f0303]" />
           <p className="text-sm text-gray-500">Total Students</p>
-          <h3 className="text-2xl font-semibold text-[#b30000]">504</h3>
+          <h3 className="text-2xl font-semibold text-[#b30000]">
+            {loading ? "..." : totalStudents}
+          </h3>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg text-center shadow border border-gray-300 border-l-red-800 border-l-8 hover:shadow-md transition">
           <CalendarIcon className="w-6 h-6 flex mx-auto text-[#8f0303]" />
           <p className="text-sm text-gray-500">Active Classes</p>
-          <h3 className="text-2xl font-semibold text-[#b30000]">56</h3>
+          <h3 className="text-2xl font-semibold text-[#b30000]">
+            {loading ? "..." : activeClasses}
+          </h3>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg text-center shadow border border-gray-300 border-l-red-800 border-l-8 hover:shadow-md transition">
           <ChartBarSquareIcon className="w-6 h-6 flex mx-auto text-[#8f0303]" />
           <p className="text-sm text-gray-500">Average Attendance</p>
-          <h3 className="text-2xl font-semibold text-[#b30000]">93.3%</h3>
+          <h3 className="text-2xl font-semibold text-[#b30000]">
+            {loading ? "..." : `${averageAttendance.toFixed(1)}%`}
+          </h3>
         </div>
       </div>
 

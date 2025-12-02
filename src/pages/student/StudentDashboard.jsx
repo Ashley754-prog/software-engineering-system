@@ -7,8 +7,7 @@ const StudentPortal = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ← FIXED: Was localStorage.getItem(1) → WRONG!
-  const studentId = localStorage.getItem('studentId') || '1'; // fallback to 1 for testing
+  const studentId = localStorage.getItem('studentId');
 
   useEffect(() => {
     const fetchPortalData = async () => {
@@ -26,7 +25,6 @@ const StudentPortal = () => {
         setData(result);
       } catch (err) {
         console.error('Fetch error:', err);
-        alert('No student data found. Did you log in? Try setting localStorage.setItem("studentId", "1") in console.');
       } finally {
         setLoading(false);
       }
@@ -71,7 +69,11 @@ const StudentPortal = () => {
   // ← REST OF YOUR BEAUTIFUL UI (unchanged)
   return (
     <>
-      <StudentTopbar studentName={profile.fullName || 'Student'} />
+      <StudentTopbar
+        studentName={profile.fullName || 'Student'}
+        gradeLevel={profile.gradeLevel}
+        lrn={profile.lrn}
+      />
 
       <div className="pt-20 min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-6">

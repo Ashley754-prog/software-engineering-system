@@ -5,6 +5,8 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 
 import StudentTopbar from "./layouts/student/StudentTopbar.jsx";
 import StudentDashboard from "./pages/student/StudentDashboard.jsx";
+import StudentProfile from "./pages/student/StudentProfile.jsx";
+
 import GradesTable from "./components/student/GradesTable.jsx";  
 import AttendanceCalendar from "./components/student/AttendanceCalendar.jsx";
 import CustomerServicePage from "./pages/student/CustomerServicePage.jsx";
@@ -43,6 +45,7 @@ function App() {
 
         <Route path="/layouts/student/student-topbar" element={<StudentTopbar />} />
         <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+        <Route path="/student/student-profile" element={<StudentProfile />} />
         <Route path="/student/grades-table" element={<GradesTable />} />
         <Route path="/student/attendance-calendar" element={<AttendanceCalendar />} />
         <Route path="/student/customer-service-page" element={<CustomerServicePage />} />

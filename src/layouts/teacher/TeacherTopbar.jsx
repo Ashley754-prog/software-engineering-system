@@ -1,10 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BellIcon, UserCircleIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
+import authService from "../../api/userService";
 
 export default function TeacherTopbar({ sidebarOpen }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        if (!isMounted) return;
+
+        const currentUser = response?.data?.user || response?.user || response;
+        setUser(currentUser || null);
+      } catch (error) {
+        if (!isMounted) return;
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleLogout = () => navigate("/login");
   const handleMainDashboard = () => navigate("/teacher/teacher-dashboard");
@@ -36,14 +61,24 @@ export default function TeacherTopbar({ sidebarOpen }) {
             className="flex items-center gap-2"
             onClick={() => setShowDropdown(!showDropdown)}
           >
-            <UserCircleIcon className="w-8 h-8 text-red-800" />
+            {user?.profilePic ? (
+              <img
+                src={user.profilePic}
+                alt="Profile"
+                className="w-8 h-8 rounded-full object-cover border border-red-800"
+              />
+            ) : (
+              <UserCircleIcon className="w-8 h-8 text-red-800" />
+            )}
             <ChevronDownIcon className={`w-4 h-4 text-red-800 transition-transform ${showDropdown ? "rotate-180" : ""}`} />
           </button>
 
           {showDropdown && (
             <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-56 text-sm z-10 animate-fadeIn">
               <div className="px-4 py-2 border-b font-semibold">
-                Ashley Villanueva
+                {user
+                  ? `${user.firstName || ""} ${user.lastName || ""}${user.username ? ` (@${user.username})` : ""}`.trim()
+                  : "Profile"}
               </div>
               <ul>
                 <li 

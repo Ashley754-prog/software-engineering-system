@@ -1,17 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserCircleIcon, PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import authService from "../../api/userService";
 
 export default function TeacherProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    firstName: "Maria",
-    lastName: "Mercedes",
-    email: "maria.mercedes@wmsu.edu.ph",
+    firstName: "",
+    lastName: "",
+    email: "",
     department: "WMSU-ILS Department",
     position: "Grade 3 Adviser",
     subjects: "English, Filipino, Arpan",
-    bio: "Dedicated educator with a passion for teaching and student development."
+    bio: "Dedicated educator with a passion for teaching and student development.",
+    username: "",
+    profilePic: ""
   });
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        if (!isMounted) return;
+
+        const currentUser = response?.data?.user || response?.user || response;
+        setUser(currentUser || null);
+
+        if (currentUser) {
+          setProfileData(prev => ({
+            ...prev,
+            firstName: currentUser.firstName || prev.firstName,
+            lastName: currentUser.lastName || prev.lastName,
+            email: currentUser.email || prev.email,
+            username: currentUser.username || prev.username,
+            department: currentUser.department || prev.department,
+            position: currentUser.position || prev.position,
+            subjects: currentUser.subjects || prev.subjects,
+            bio: currentUser.bio || prev.bio,
+            profilePic: currentUser.profilePic || prev.profilePic,
+          }));
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        setError("Failed to load profile");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const [schedules, setSchedules] = useState([
     { id: 1, day: "Monday - Friday", time: "8:00 AM - 9:00 AM", subject: "English", gradeSection: "Grade 3 - Wisdom" },
@@ -46,15 +93,105 @@ export default function TeacherProfile() {
     setSchedules(schedules.filter(schedule => schedule.id !== id));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    alert("Profile updated successfully!");
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileData(prev => ({
+        ...prev,
+        profilePic: reader.result || "",
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    try {
+      setError("");
+      const updates = {
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        email: profileData.email,
+        username: profileData.username,
+        department: profileData.department,
+        position: profileData.position,
+        subjects: profileData.subjects,
+        bio: profileData.bio,
+        profilePic: profileData.profilePic,
+      };
+
+      const response = await authService.updateCurrentUser(updates);
+      const updatedUser = response?.data?.user || response?.user || response;
+
+      if (updatedUser) {
+        setProfileData(prev => ({
+          ...prev,
+          firstName: updatedUser.firstName || prev.firstName,
+          lastName: updatedUser.lastName || prev.lastName,
+          email: updatedUser.email || prev.email,
+          username: updatedUser.username || prev.username,
+          department: updatedUser.department || prev.department,
+          position: updatedUser.position || prev.position,
+          subjects: updatedUser.subjects || prev.subjects,
+          bio: updatedUser.bio || prev.bio,
+          profilePic: updatedUser.profilePic || prev.profilePic,
+        }));
+      }
+
+      setIsEditing(false);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      const message = err?.message || err?.error || "Failed to update profile";
+      setError(message);
+    }
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     // Reset to original data if needed
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-lg shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white p-3 rounded-full">
+                <UserCircleIcon className="w-12 h-12 text-red-800" />
+              </div>
+              <h2 className="text-4xl font-bold text-white">Teacher Profile</h2>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+          <div className="text-gray-600">Loading profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-red-800 to-red-900 rounded-lg shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white p-3 rounded-full">
+                <UserCircleIcon className="w-12 h-12 text-red-800" />
+              </div>
+              <h2 className="text-4xl font-bold text-white">Teacher Profile</h2>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+          <div className="text-red-600">{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -82,21 +219,40 @@ export default function TeacherProfile() {
         <div className="flex items-start gap-8 mb-8">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-40 h-40 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center shadow-lg">
-              <UserCircleIcon className="w-32 h-32 text-gray-500" />
+            <div className="w-40 h-40 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+              {profileData.profilePic ? (
+                <img
+                  src={profileData.profilePic}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <UserCircleIcon className="w-32 h-32 text-gray-500" />
+              )}
             </div>
             {isEditing && (
-              <button className="absolute bottom-2 right-2 bg-red-800 text-white p-3 rounded-full hover:bg-red-900 transition shadow-lg">
+              <label className="absolute bottom-2 right-2 bg-red-800 text-white p-3 rounded-full hover:bg-red-900 transition shadow-lg cursor-pointer">
                 <PencilIcon className="w-5 h-5" />
-              </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePicChange}
+                  className="hidden"
+                />
+              </label>
             )}
           </div>
 
           {/* Basic Info */}
           <div className="flex-grow">
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">
-              Ms. {profileData.firstName} {profileData.lastName}
+            <h3 className="text-3xl font-bold text-gray-900 mb-1">
+              {profileData.firstName} {profileData.lastName}
             </h3>
+            
+            {profileData.username && (
+              <p className="text-sm text-gray-600 mb-3">@{profileData.username}</p>
+            )}
+            
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-red-100 text-red-800 px-4 py-1 rounded-full text-sm font-semibold">
                 {profileData.position}
