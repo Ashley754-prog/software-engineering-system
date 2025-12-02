@@ -27,16 +27,27 @@ const handleSubmit = async (e) => {
 
     // 1. Try teacher/admin login first
     try {
-      const response = await authService.login({ email: emailLower, password });
-      const user = response?.data?.user || response?.user;
-
-      if (user?.role === "admin") {
-        navigate("/admin/admin-dashboard");
-        return;
-      }
-      if (user?.role === "teacher") {
-        navigate("/teacher/teacher-dashboard");
-        return;
+      const response = await fetch('http://localhost:3001/api/teachers/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailLower, password })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.teacher?.role === "admin") {
+          localStorage.setItem('adminId', data.teacher.id);
+          localStorage.setItem('adminName', `${data.teacher.firstName} ${data.teacher.lastName}`);
+          navigate("/admin/admin-dashboard");
+          return;
+        }
+        if (data.teacher?.role === "teacher") {
+          localStorage.setItem('teacherId', data.teacher.id);
+          localStorage.setItem('teacherName', `${data.teacher.firstName} ${data.teacher.lastName}`);
+          navigate("/teacher/teacher-dashboard");
+          return;
+        }
       }
     } catch (err) {
       // If teacher/admin fails → try student login

@@ -85,15 +85,19 @@ export default function CreateAccount() {
         throw new Error(`Failed to create ${formData.role} account: ${errorData.error || errorData.details || 'Unknown error'}`);
       }
 
-      setSuccess(`${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)} account created successfully! Redirecting...`);
-      
-      setTimeout(() => {
-        if (formData.role === "teacher") {
-          navigate("/teacher/teacher-dashboard");
-        } else if (formData.role === "admin") {
+      if (formData.role === "admin") {
+        // Admin accounts can login immediately
+        setSuccess("Admin account created successfully! Redirecting to dashboard...");
+        setTimeout(() => {
           navigate("/admin/admin-dashboard");
-        }
-      }, 1200);
+        }, 2000);
+      } else if (formData.role === "teacher") {
+        // Teacher accounts need approval - show waiting message
+        setSuccess("Teacher account created successfully! Your account is now pending admin approval. You will be redirected to the login page.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 4000);
+      }
       
     } catch (err) {
       console.error("Registration error:", err);

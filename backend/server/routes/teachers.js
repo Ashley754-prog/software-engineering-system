@@ -5,6 +5,73 @@ const pool = require('../config/db');
 
 const saltRounds = 10;
 
+// Teacher login
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const [teachers] = await pool.query(
+      'SELECT * FROM teachers WHERE email = ?',
+      [email]
+    );
+
+    if (teachers.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const teacher = teachers[0];
+
+    // Check verification status
+    if (teacher.verification_status !== 'approved') {
+      if (teacher.verification_status === 'pending') {
+        return res.status(403).json({ 
+          error: 'Account pending verification. Please wait for admin approval.' 
+        });
+      } else if (teacher.verification_status === 'rejected') {
+        return res.status(403).json({ 
+          error: 'Account rejected. Please contact administrator.' 
+        });
+      }
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, teacher.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Remove password from response
+    const { password: _, ...teacherData } = teacher;
+
+    res.json({
+      message: 'Login successful',
+      teacher: {
+        id: teacherData.id,
+        username: teacherData.username,
+        firstName: teacherData.first_name,
+        lastName: teacherData.last_name,
+        email: teacherData.email,
+        role: teacherData.role,
+        department: teacherData.department,
+        position: teacherData.position,
+        subjects: teacherData.subjects,
+        bio: teacherData.bio,
+        profilePic: teacherData.profile_pic,
+        verificationStatus: teacherData.verification_status
+      }
+    });
+  } catch (err) {
+    console.error('Teacher login error:', err);
+    res.status(500).json({ 
+      error: 'Login failed', 
+      details: err.message 
+    });
+  }
+});
+
 // Create Teacher/Admin Account
 router.post('/', async (req, res) => {
   try {
@@ -27,6 +94,7 @@ router.post('/', async (req, res) => {
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         role ENUM('teacher', 'admin') NOT NULL,
+        verification_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
         department VARCHAR(100) DEFAULT 'WMSU-ILS Department',
         position VARCHAR(100) DEFAULT 'Teacher',
         subjects TEXT,
@@ -35,6 +103,12 @@ router.post('/', async (req, res) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
+    `);
+
+    // Add verification_status column if it doesn't exist (for existing tables)
+    await pool.query(`
+      ALTER TABLE teachers 
+      ADD COLUMN IF NOT EXISTS verification_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending'
     `);
 
     // Validation
@@ -292,6 +366,86 @@ router.get('/count', async (req, res) => {
     console.error('Get teachers count error:', err);
     res.status(500).json({ 
       error: 'Failed to fetch teachers count', 
+      details: err.message 
+    });
+  }
+});
+
+// Get pending teachers
+router.get('/pending', async (req, res) => {
+  try {
+    const [teachers] = await pool.query(`
+      SELECT id, username, first_name, last_name, email, role, created_at 
+      FROM teachers 
+      WHERE verification_status = 'pending'
+      ORDER BY created_at DESC
+    `);
+    res.json({ teachers });
+  } catch (err) {
+    console.error('Get pending teachers error:', err);
+    res.status(500).json({ 
+      error: 'Failed to fetch pending teachers', 
+      details: err.message 
+    });
+  }
+});
+
+// Get approved teachers
+router.get('/approved', async (req, res) => {
+  try {
+    const [teachers] = await pool.query(`
+      SELECT id, username, first_name, last_name, email, role, department, position, created_at 
+      FROM teachers 
+      WHERE verification_status = 'approved'
+      ORDER BY created_at DESC
+    `);
+    res.json({ teachers });
+  } catch (err) {
+    console.error('Get approved teachers error:', err);
+    res.status(500).json({ 
+      error: 'Failed to fetch approved teachers', 
+      details: err.message 
+    });
+  }
+});
+
+// Approve teacher
+router.patch('/:id/approve', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(`
+      UPDATE teachers 
+      SET verification_status = 'approved', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    `, [id]);
+    
+    res.json({ message: 'Teacher approved successfully' });
+  } catch (err) {
+    console.error('Approve teacher error:', err);
+    res.status(500).json({ 
+      error: 'Failed to approve teacher', 
+      details: err.message 
+    });
+  }
+});
+
+// Reject teacher
+router.patch('/:id/reject', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(`
+      UPDATE teachers 
+      SET verification_status = 'rejected', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    `, [id]);
+    
+    res.json({ message: 'Teacher rejected successfully' });
+  } catch (err) {
+    console.error('Reject teacher error:', err);
+    res.status(500).json({ 
+      error: 'Failed to reject teacher', 
       details: err.message 
     });
   }

@@ -1,7 +1,91 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { UsersIcon, CheckIcon, XMarkIcon, PencilSquareIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/solid";
 
 export default function AdminTeachers() {
+  const [pendingTeachers, setPendingTeachers] = useState([]);
+  const [approvedTeachers, setApprovedTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch pending teachers
+      const pendingResponse = await fetch('http://localhost:3001/api/teachers/pending');
+      const pendingData = await pendingResponse.json();
+      
+      // Fetch approved teachers
+      const approvedResponse = await fetch('http://localhost:3001/api/teachers/approved');
+      const approvedData = await approvedResponse.json();
+      
+      setPendingTeachers(pendingData.teachers || []);
+      setApprovedTeachers(approvedData.teachers || []);
+    } catch (err) {
+      setError('Failed to fetch teachers');
+      console.error('Error fetching teachers:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async (teacherId) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/teachers/${teacherId}/approve`, {
+        method: 'PATCH'
+      });
+      
+      if (response.ok) {
+        // Refresh the lists
+        fetchTeachers();
+        alert('Teacher approved successfully!');
+      } else {
+        throw new Error('Failed to approve teacher');
+      }
+    } catch (err) {
+      alert('Error approving teacher: ' + err.message);
+    }
+  };
+
+  const handleReject = async (teacherId) => {
+    if (confirm('Are you sure you want to reject this teacher?')) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/teachers/${teacherId}/reject`, {
+          method: 'PATCH'
+        });
+        
+        if (response.ok) {
+          // Refresh the lists
+          fetchTeachers();
+          alert('Teacher rejected successfully!');
+        } else {
+          throw new Error('Failed to reject teacher');
+        }
+      } catch (err) {
+        alert('Error rejecting teacher: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-10">
+        <div className="bg-white rounded-lg shadow p-5 border border-gray-300 border-b-red-800 border-b-4">
+          <div className="flex items-center gap-4 mb-4">
+            <UsersIcon className="w-20 h-20 text-red-800" />
+            <h2 className="text-5xl pl-5 font-bold text-gray-900">Teachers Management</h2>
+          </div>
+        </div>
+        <div className="text-center py-8">
+          <div className="text-gray-600">Loading teachers...</div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-10">
       <div className="bg-white rounded-lg shadow p-5 border border-gray-300 border-b-red-800 border-b-4">
@@ -18,115 +102,131 @@ export default function AdminTeachers() {
       <div className="grid grid-cols-3 gap-6">
         <div className="p-4 bg-red-50 rounded-lg text-center shadow-sm border border-red-100">
           <h3 className="text-lg font-semibold text-red-800">Total Teachers</h3>
-          <p className="text-2xl font-bold">45</p>
+          <p className="text-2xl font-bold">{pendingTeachers.length + approvedTeachers.length}</p>
         </div>
-        <div className="p-4 bg-red-50 rounded-lg text-center shadow-sm border border-red-100">
-          <h3 className="text-lg font-semibold text-red-800">Active Teachers</h3>
-          <p className="text-2xl font-bold">39</p>
+        <div className="p-4 bg-green-50 rounded-lg text-center shadow-sm border border-green-100">
+          <h3 className="text-lg font-semibold text-green-800">Active Teachers</h3>
+          <p className="text-2xl font-bold">{approvedTeachers.length}</p>
         </div>
-        <div className="p-4 bg-red-50 rounded-lg text-center shadow-sm border border-red-100">
-          <h3 className="text-lg font-semibold text-red-800">Pending Verification</h3>
-          <p className="text-2xl font-bold">6</p>
+        <div className="p-4 bg-yellow-50 rounded-lg text-center shadow-sm border border-yellow-100">
+          <h3 className="text-lg font-semibold text-yellow-800">Pending Verification</h3>
+          <p className="text-2xl font-bold">{pendingTeachers.length}</p>
         </div>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-xl font-semibold text-red-800 mb-2">Teacher Actions</h3>
-        <ul className="list-disc ml-5 text-gray-700 space-y-1">
-          <li>Verify new teacher registrations</li>
-          <li>Add new teacher manually</li>
-          <li>Edit teacher information</li>
-          <li>Remove teacher account</li>
-          <li>Assign subjects and grade levels</li>
-        </ul>
-      </div>
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-300 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
 
       <div className="mt-10">
         <h3 className="text-xl font-bold text-red-800 mb-4">Pending Teacher Verification</h3>
 
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-red-100 text-red-800">
-              <tr>
-                <th className="p-3 border">Teacher ID</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">Email</th>
-                <th className="p-3 border">Department</th>
-                <th className="p-3 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="hover:bg-gray-50">
-                <td className="p-3 border">T-00123</td>
-                <td className="p-3 border">Ma’am Jessa Lopez</td>
-                <td className="p-3 border">jessalopez@wmsu.edu.ph</td>
-                <td className="p-3 border">Elementary</td>
-                <td className="p-3 border flex gap-3">
-                  <button className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    <CheckIcon className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                    <XMarkIcon className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <EyeIcon className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="p-3 border">T-00125</td>
-                <td className="p-3 border">Ma’am Trina Uy</td>
-                <td className="p-3 border">trina.uy@wmsu.edu.ph</td>
-                <td className="p-3 border">Elementary</td>
-                <td className="p-3 border flex gap-3">
-                  <button className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    <CheckIcon className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                    <XMarkIcon className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <EyeIcon className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {pendingTeachers.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+            No pending teacher verifications
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-white rounded-lg shadow">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-yellow-100 text-yellow-800">
+                <tr>
+                  <th className="border border-gray-300 px-4 py-3">Name</th>
+                  <th className="border border-gray-300 px-4 py-3">Username</th>
+                  <th className="border border-gray-300 px-4 py-3">Email</th>
+                  <th className="border border-gray-300 px-4 py-3">Role</th>
+                  <th className="border border-gray-300 px-4 py-3">Applied Date</th>
+                  <th className="border border-gray-300 px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingTeachers.map((teacher) => (
+                  <tr key={teacher.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 px-4 py-3">
+                      {teacher.first_name} {teacher.last_name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.username}</td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.email}</td>
+                    <td className="border border-gray-300 px-4 py-3">
+                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                        {teacher.role}
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 px-4 py-3">
+                      {new Date(teacher.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(teacher.id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition flex items-center gap-1"
+                        >
+                          <CheckIcon className="w-4 h-4" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(teacher.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition flex items-center gap-1"
+                        >
+                          <XMarkIcon className="w-4 h-4" />
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="mt-10">
-        <h3 className="text-xl font-bold text-red-800 mb-4">Active Teachers</h3>
+        <h3 className="text-xl font-bold text-green-800 mb-4">Active Teachers</h3>
 
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-          <table className="w-full border-collapse text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 border">Teacher ID</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">Assigned Grades</th>
-                <th className="p-3 border">Status</th>
-                <th className="p-3 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="hover:bg-gray-50">
-                <td className="p-3 border">T-00124</td>
-                <td className="p-3 border">Sir Mark Punzalan</td>
-                <td className="p-3 border">G5 – Math</td>
-                <td className="p-3 border text-green-700 font-semibold">Active</td>
-                <td className="p-3 border flex gap-3">
-                  <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {approvedTeachers.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+            No approved teachers
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-white rounded-lg shadow">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-green-100 text-green-800">
+                <tr>
+                  <th className="border border-gray-300 px-4 py-3">Name</th>
+                  <th className="border border-gray-300 px-4 py-3">Username</th>
+                  <th className="border border-gray-300 px-4 py-3">Email</th>
+                  <th className="border border-gray-300 px-4 py-3">Role</th>
+                  <th className="border border-gray-300 px-4 py-3">Department</th>
+                  <th className="border border-gray-300 px-4 py-3">Position</th>
+                  <th className="border border-gray-300 px-4 py-3">Joined Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {approvedTeachers.map((teacher) => (
+                  <tr key={teacher.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 px-4 py-3">
+                      {teacher.first_name} {teacher.last_name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.username}</td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.email}</td>
+                    <td className="border border-gray-300 px-4 py-3">
+                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                        {teacher.role}
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.department}</td>
+                    <td className="border border-gray-300 px-4 py-3">{teacher.position}</td>
+                    <td className="border border-gray-300 px-4 py-3">
+                      {new Date(teacher.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
