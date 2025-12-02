@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { UserCircleIcon, PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
-import authService from "../../api/userService";
+import teacherService from "../../api/teacherService";
 
 export default function TeacherProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +25,9 @@ export default function TeacherProfile() {
 
     const fetchUser = async () => {
       try {
-        const response = await authService.getCurrentUser();
+        // For now, we'll use a hardcoded teacher ID. In a real app, this would come from authentication
+        const teacherId = localStorage.getItem('teacherId') || '1';
+        const response = await teacherService.getCurrentTeacher(teacherId);
         if (!isMounted) return;
 
         const currentUser = response?.data?.user || response?.user || response;
@@ -47,7 +49,14 @@ export default function TeacherProfile() {
         }
       } catch (err) {
         if (!isMounted) return;
-        setError("Failed to load profile");
+        console.error('Profile load error:', err);
+        
+        // Check if it's a 404 error (teacher not found)
+        if (err.response?.status === 404) {
+          setError("Teacher profile not found. Please create a teacher account first.");
+        } else {
+          setError("Failed to load profile: " + (err?.message || "Unknown error"));
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -99,10 +108,15 @@ export default function TeacherProfile() {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setProfileData(prev => ({
-        ...prev,
-        profilePic: reader.result || "",
-      }));
+      const result = reader.result;
+      if (result && result.startsWith('data:image/')) {
+        setProfileData(prev => ({
+          ...prev,
+          profilePic: result,
+        }));
+      } else {
+        setError('Invalid image file');
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -111,18 +125,19 @@ export default function TeacherProfile() {
     try {
       setError("");
       const updates = {
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
         email: profileData.email,
         username: profileData.username,
         department: profileData.department,
         position: profileData.position,
         subjects: profileData.subjects,
         bio: profileData.bio,
-        profilePic: profileData.profilePic,
+        profile_pic: profileData.profilePic,
       };
 
-      const response = await authService.updateCurrentUser(updates);
+      const teacherId = localStorage.getItem('teacherId') || '1';
+      const response = await teacherService.updateTeacherProfile(teacherId, updates);
       const updatedUser = response?.data?.user || response?.user || response;
 
       if (updatedUser) {

@@ -20,6 +20,7 @@ import ReportsPage from "./pages/teacher/ReportsPage";
 import CustomerService from "./pages/teacher/CustomerService";
 import TeacherProfile from "./pages/teacher/TeacherProfile";
 import TeacherSettings from "./pages/teacher/TeacherSettings.jsx";
+import QRPortal from "./pages/teacher/QRPortal.jsx";
 
 import AdminLayout from "./layouts/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -107,6 +108,7 @@ function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/customer-service" element={<CustomerService />} />
           <Route path="/teacher-settings" element={<TeacherSettings />} />
+          <Route path="/qr-portal" element={<QRPortal />} />
         </Route>
 
         {/* ADMIN ROUTES — 100% UNTOUCHED */}
