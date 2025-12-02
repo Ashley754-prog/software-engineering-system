@@ -1,6 +1,8 @@
 // server/controllers/studentController.js
 const pool = require('../config/db');
 const QRCode = require('qrcode');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const formatStudent = (student) => ({
   id: student.id,
@@ -32,30 +34,56 @@ const createStudent = async (req, res) => {
       gradeLevel, section, contact, wmsuEmail, password, profilePic
     } = req.body;
 
+    // VALIDATION
     if (!lrn || !firstName || !lastName || !wmsuEmail || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // CHECK DUPLICATES
     const [lrnExists] = await pool.query('SELECT 1 FROM students WHERE lrn = ?', [lrn]);
     if (lrnExists.length) return res.status(409).json({ error: 'LRN already exists' });
 
     const [emailExists] = await pool.query('SELECT 1 FROM students WHERE wmsu_email = ?', [wmsuEmail]);
     if (emailExists.length) return res.status(409).json({ error: 'Email already exists' });
 
+    // HASH THE PASSWORD — THIS IS THE FIX
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const fullName = `${firstName} ${middleName || ''} ${lastName}`.trim();
     const qrData = JSON.stringify({ lrn, name: fullName, gradeLevel, section, email: wmsuEmail });
     const qrCode = await QRCode.toDataURL(qrData, { width: 300, margin: 2 });
 
+    // SAVE WITH HASHED PASSWORD
     await pool.query(
-      `INSERT INTO students (lrn, first_name, middle_name, last_name, full_name, age, sex, grade_level, section, contact, wmsu_email, password, profile_pic, qr_code)
+      `INSERT INTO students 
+       (lrn, first_name, middle_name, last_name, full_name, age, sex, grade_level, section, contact, wmsu_email, password, profile_pic, qr_code)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [lrn, firstName, middleName || '', lastName, fullName, age || null, sex, gradeLevel, section, contact, wmsuEmail, password, profilePic || null, qrCode]
+      [
+        lrn,
+        firstName,
+        middleName || null,
+        lastName,
+        fullName,
+        age || null,
+        sex,
+        gradeLevel,
+        section,
+        contact || null,
+        wmsuEmail,
+        hashedPassword,        // ← NOW HASHED
+        profilePic || null,
+        qrCode
+      ]
     );
 
     const [[newStudent]] = await pool.query('SELECT * FROM students WHERE lrn = ?', [lrn]);
-    res.status(201).json({ message: 'Student created successfully', student: formatStudent(newStudent) });
+    res.status(201).json({
+      message: 'Student created successfully',
+      student: formatStudent(newStudent)
+    });
+
   } catch (err) {
-    console.error(err);
+    console.error("Create student error:", err);
     res.status(500).json({ error: 'Failed to create student', details: err.message });
   }
 };

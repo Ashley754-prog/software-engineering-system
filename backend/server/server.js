@@ -20,6 +20,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/delete-requests', deleteRequestRoutes);
 app.use('/api/students', gradeRoutes); // grades under students
 app.use('/api/student', require('./routes/studentPortal'));
+app.use('/api/student', require('./routes/studentAuth'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'Student Management API Running!' });

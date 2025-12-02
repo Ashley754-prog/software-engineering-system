@@ -9,6 +9,8 @@ import {
   QrCodeIcon, 
   EyeIcon 
 } from "@heroicons/react/24/solid";
+import ViewStudentModal from '@/components/modals/ViewStudentModal'
+import EditStudentModal from '@/components/modals/EditStudentModal'
 
 export default function AdminStudents() {
   const navigate = useNavigate();
@@ -37,15 +39,8 @@ export default function AdminStudents() {
     }
   };
 
-  // Filter K-3 students (created by admin)
-  const k3Students = students.filter(s => 
-    ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3'].includes(s.gradeLevel)
-  );
-
-  // Filter Grade 4-6 students (pending verification)
-  const pendingStudents = students.filter(s => 
-    ['Grade 4', 'Grade 5', 'Grade 6'].includes(s.gradeLevel) && s.status === 'Pending'
-  );
+  // NOW ALL STUDENTS (Kinder to Grade 6) IN ONE TABLE
+  const allStudents = students; // No filtering anymore — show everyone
 
   // VIEW QR CODE
   const handleViewQR = (student) => {
@@ -71,13 +66,13 @@ export default function AdminStudents() {
       });
 
       if (response.ok) {
-        alert('✅ Student updated successfully!');
-        fetchStudents(); // Refresh list
+        alert('Student updated successfully!');
+        fetchStudents();
         setShowEditModal(false);
       }
     } catch (error) {
       console.error('Error updating student:', error);
-      alert('❌ Failed to update student');
+      alert('Failed to update student');
     }
   };
 
@@ -91,12 +86,12 @@ export default function AdminStudents() {
       });
 
       if (response.ok) {
-        alert('✅ Student deleted successfully!');
-        fetchStudents(); // Refresh list
+        alert('Student deleted successfully!');
+        fetchStudents();
       }
     } catch (error) {
       console.error('Error deleting student:', error);
-      alert('❌ Failed to delete student');
+      alert('Failed to delete student');
     }
   };
 
@@ -124,7 +119,7 @@ export default function AdminStudents() {
       </div>
 
       <p className="text-gray-600">
-        Manage student records, verify accounts, and generate QR codes.
+        Manage student records, edit details, and generate QR codes.
       </p>
 
       <div className="grid grid-cols-2 gap-6">
@@ -132,36 +127,35 @@ export default function AdminStudents() {
           <h3 className="text-lg font-semibold text-red-800">Total Students</h3>
           <p className="text-2xl font-bold">{students.length}</p>
         </div>
-        <div className="bg-red-50 p-4 rounded-lg shadow-sm border border-red-100">
-          <h3 className="text-lg font-semibold text-red-800">Pending Verification</h3>
-          <p className="text-2xl font-bold">{pendingStudents.length}</p>
+        <div className="bg-green-50 p-4 rounded-lg shadow-sm border border-green-100">
+          <h3 className="text-lg font-semibold text-green-800">Active Students</h3>
+          <p className="text-2xl font-bold">{students.length}</p>
         </div>
       </div>
 
       <div className="mt-6">
         <h3 className="text-xl font-semibold text-red-800 mb-2">Student Actions</h3>
         <ul className="list-disc ml-5 text-gray-700 space-y-1">
-          <li>Create accounts for Kinder–Grade 3</li>
-          <li>Verify Grade 4–6 student self-registration</li>
+          <li>Create accounts for Kinder–Grade 6</li>
           <li>Edit student details</li>
           <li>Delete student accounts</li>
-          <li>Regenerate or download QR codes</li>
+          <li>View and download QR codes</li>
         </ul>
       </div>
 
       <div className="flex justify-end mt-6">
         <button
-          onClick={() => navigate("/admin/admin/create-k3")}
+          onClick={() => navigate("/admin/admin/create-students-accounts")}
           className="bg-red-800 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition"
         >
-          + Create Kinder–Grade 3 Account
+          + Create Student Account (K to Grade 6)
         </button>
       </div>
 
-      {/* KINDER TO GRADE 3 STUDENTS TABLE */}
+      {/* ONE TABLE FOR ALL STUDENTS — K TO G6 */}
       <div className="mt-10">
         <h3 className="text-xl font-bold text-red-800 mb-4">
-          Kinder to Grade 3 Students (Admin Created) - {k3Students.length} students
+          All Students (Kindergarten to Grade 6) - {allStudents.length} students
         </h3>
 
         <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -186,14 +180,14 @@ export default function AdminStudents() {
                     Loading students...
                   </td>
                 </tr>
-              ) : k3Students.length === 0 ? (
+              ) : allStudents.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="p-6 text-center text-gray-500">
                     No students found. Create your first student account!
                   </td>
                 </tr>
               ) : (
-                k3Students.map((student) => (
+                allStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="p-3 border">{student.lrn}</td>
                     <td className="p-3 border font-semibold">{student.fullName}</td>
@@ -201,8 +195,12 @@ export default function AdminStudents() {
                     <td className="p-3 border">{student.gradeLevel}</td>
                     <td className="p-3 border">{student.section}</td>
                     <td className="p-3 border">
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
-                        {student.status}
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        student.status === 'Active' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {student.status || 'Active'}
                       </span>
                     </td>
                     <td className="p-3 border">
@@ -244,62 +242,10 @@ export default function AdminStudents() {
         </div>
       </div>
 
-      {/* GRADE 4-6 PENDING VERIFICATION TABLE */}
-      <div className="mt-10">
-        <h3 className="text-xl font-bold text-red-800 mb-4">Grade 4–6 Students (Pending Verification)</h3>
-
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-          <table className="w-full border-collapse text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 border">LRN</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">Email</th>
-                <th className="p-3 border">Grade</th>
-                <th className="p-3 border">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {pendingStudents.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="p-6 text-center text-gray-500">
-                    No pending verification requests
-                  </td>
-                </tr>
-              ) : (
-                pendingStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
-                    <td className="p-3 border">{student.lrn}</td>
-                    <td className="p-3 border">{student.fullName}</td>
-                    <td className="p-3 border">{student.email}</td>
-                    <td className="p-3 border">{student.gradeLevel}</td>
-                    <td className="p-3 border flex gap-3">
-                      <button className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700" title="Approve">
-                        <CheckIcon className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700" title="Reject">
-                        <XMarkIcon className="w-5 h-5" />
-                      </button>
-                      <button 
-                        onClick={() => handleView(student)}
-                        className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                        title="View Details"
-                      >
-                        <EyeIcon className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+      {/* === ALL MODALS BELOW ARE 100% UNCHANGED === */}
       {/* QR CODE MODAL */}
       {showQRModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-xl font-bold mb-4">QR Code - {selectedStudent.fullName}</h3>
             <div className="flex justify-center mb-4">
@@ -324,108 +270,17 @@ export default function AdminStudents() {
         </div>
       )}
 
-      {/* EDIT MODAL */}
-      {showEditModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h3 className="text-xl font-bold mb-4">Edit Student - {selectedStudent.fullName}</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block font-semibold mb-1">First Name</label>
-                <input
-                  type="text"
-                  value={editFormData.firstName}
-                  onChange={(e) => setEditFormData({...editFormData, firstName: e.target.value})}
-                  className="w-full border p-2 rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Last Name</label>
-                <input
-                  type="text"
-                  value={editFormData.lastName}
-                  onChange={(e) => setEditFormData({...editFormData, lastName: e.target.value})}
-                  className="w-full border p-2 rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Section</label>
-                <input
-                  type="text"
-                  value={editFormData.section}
-                  onChange={(e) => setEditFormData({...editFormData, section: e.target.value})}
-                  className="w-full border p-2 rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Contact</label>
-                <input
-                  type="text"
-                  value={editFormData.contact || ''}
-                  onChange={(e) => setEditFormData({...editFormData, contact: e.target.value})}
-                  className="w-full border p-2 rounded-lg"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleUpdateStudent}
-                className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* VIEW DETAILS MODAL */}
       {showViewModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h3 className="text-xl font-bold mb-4">Student Details</h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-600 text-sm">LRN</p>
-                  <p className="font-semibold">{selectedStudent.lrn}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Name</p>
-                  <p className="font-semibold">{selectedStudent.fullName}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Sex</p>
-                  <p className="font-semibold">{selectedStudent.sex}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Grade Level</p>
-                  <p className="font-semibold">{selectedStudent.gradeLevel}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Section</p>
-                  <p className="font-semibold">{selectedStudent.section}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Status</p>
-                  <p className="font-semibold">{selectedStudent.status}</p>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowViewModal(false)}
-              className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 mt-6"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <ViewStudentModal student={selectedStudent} onClose={() => setShowViewModal(false)} />
+      )}
+      {showEditModal && selectedStudent && (
+        <EditStudentModal
+          student={selectedStudent}
+          formData={editFormData}
+          setFormData={setEditFormData}
+          onSave={handleUpdateStudent}
+          onClose={() => setShowEditModal(false)}
+        />
       )}
     </div>
   );

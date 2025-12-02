@@ -138,16 +138,6 @@ const handleSubmit = async (e) => {
             {isSubmitting ? "Logging in..." : "Login"}
           </button>
         </form>
-
-        <div className="flex justify-between text-sm mt-5 text-gray-600">
-          <Link to="/create-account" className="hover:text-red-800 underline">
-            Create an Account
-          </Link>
-          <Link to="/forgot-password" className="text-red-800 hover:underline font-medium">
-            Forgot Password?
-          </Link>
-        </div>
-
       </div>
     </div>
   );

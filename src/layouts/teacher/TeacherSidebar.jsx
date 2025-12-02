@@ -6,7 +6,6 @@ import {
   BookOpenIcon,
   ClipboardDocumentCheckIcon,
   ViewColumnsIcon,
-  AcademicCapIcon,
   UsersIcon,
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/solid";
@@ -22,7 +21,6 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
     { name: "Grade Level", icon: <BookOpenIcon className="w-6 h-6" />, path: "/grade-level" },
     { name: "Edit Grades", icon: <ClipboardDocumentCheckIcon className="w-6 h-6" />, path: "/edit-grades" },
     { name: "Class List", icon: <ViewColumnsIcon className="w-6 h-6" />, path: "/class-list" },
-    { name: "QR Code Portal", icon: <AcademicCapIcon className="w-6 h-6" />, path: "/qr-portal" },
     { name: "Reports", icon: <UsersIcon className="w-6 h-6" />, path: "/reports" },
     { name: "Customer Service", icon: <ChatBubbleLeftEllipsisIcon className="w-6 h-6" />, path: "/customer-service" },
   ];
@@ -78,22 +76,29 @@ export default function TeacherSidebar({ sidebarOpen, setSidebarOpen }) {
         ))}
       </nav>
 
+      {/* SETTINGS — BOTTOM (CLICKABLE + ACTIVE STATE + NO COLLAPSE BUG) */}
       <div
-        className="relative px-4 py-4 flex items-center gap-3 hover:bg-red-700 transition-all duration-300 ease-in-out cursor-pointer"
+        className="relative"
         onMouseEnter={() => setHoveredItem("Settings")}
         onMouseLeave={() => setHoveredItem(null)}
       >
-        <Cog6ToothIcon className="w-6 h-6 flex-shrink-0 translate-x-[10px]" />
-        {sidebarOpen && (
-          <span className="text-sm transition-all duration-300 ease-in-out translate-x-[10px]">
-            Settings
-          </span>
-        )}
+        <button
+          onClick={() => navigate("/teacher-settings")}
+          className={`flex w-full items-center gap-4 px-5 py-4 text-left transition-all duration-300 rounded-md ${
+            location.pathname === "/teacher/teacher-settings"
+              ? "bg-red-700 text-yellow-300"
+              : "hover:bg-red-700"
+          }`}
+        >
+          <Cog6ToothIcon className="w-6 h-6 flex-shrink-0 translate-x-[10px]" />
+          {sidebarOpen && (
+            <span className="text-sm font-medium translate-x-[10px]">Settings</span>
+          )}
+        </button>
+
+        {/* Tooltip when collapsed */}
         {!sidebarOpen && hoveredItem === "Settings" && (
-          <div
-            className="absolute left-[90px] top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg"
-            style={{ animation: "fadeIn 0.2s ease-in-out" }}
-          >
+          <div className="absolute left-[90px] top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded px-3 py-1.5 whitespace-nowrap shadow-2xl">
             Settings
           </div>
         )}

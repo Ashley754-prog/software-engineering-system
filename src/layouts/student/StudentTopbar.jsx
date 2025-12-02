@@ -27,9 +27,10 @@ export default function StudentTopbar({ studentName, gradeLevel, lrn }) {
     setDropdownOpen(false);
   };
 
-  const handleLogout = () => {
-    navigate("/login");
-  };
+const handleLogout = () => {
+  localStorage.removeItem("studentId");  // ← THIS CLEARS THE LOGIN
+  navigate("/students-login");
+};
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-red-900 text-white flex items-center justify-between px-8 z-50 shadow-xl">

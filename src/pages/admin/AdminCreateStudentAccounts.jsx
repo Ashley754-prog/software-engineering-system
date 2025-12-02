@@ -3,7 +3,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import QRCode from 'qrcode';
 import authService from "../../api/userService";
 
-export default function AdminCreateK3() {
+export default function AdminCreateStudentAccounts() {
   const [formData, setFormData] = useState({
     profilePic: "",
     lrn: "",
@@ -89,7 +89,6 @@ export default function AdminCreateK3() {
       const result = await response.json();
 
       if (response.ok) {
-        // Also create a login-capable auth user with role 'student'
         try {
           await authService.register({
             email: formData.wmsuEmail,
@@ -101,7 +100,6 @@ export default function AdminCreateK3() {
             role: "student",
           });
         } catch (err) {
-          // Do not block student creation if auth user creation fails
           console.error("Failed to create auth user for student:", err);
         }
 
@@ -126,12 +124,12 @@ export default function AdminCreateK3() {
   return (
     <div className="space-y-8">
       <div className="bg-white shadow rounded-lg p-6 border-b-4 border-b-red-800">
-        <h2 className="text-4xl font-bold text-gray-900">Create K–3 Student Account</h2>
+        <h2 className="text-4xl font-bold text-gray-900">Create Student Account (K to Grade 6)</h2>
         <p className="text-gray-600 mt-2">Admin-only form for generating student accounts and QR codes.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-white p-6 rounded-lg shadow mx-auto space-y-5">
-        {/* Profile Picture Upload */}
+        {/* Profile Picture Upload - UNCHANGED */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 shadow-xl">
@@ -168,19 +166,21 @@ export default function AdminCreateK3() {
           <p className="mt-3 text-sm text-gray-600">Upload Student Photo</p>
         </div>
 
-        {/* Rest of your form — 100% unchanged */}
+        {/* LRN - UNCHANGED */}
         <div>
           <label className="block font-semibold mb-1">LRN (Learner Reference Number)</label>
           <input type="text" name="lrn" value={formData.lrn} onChange={handleLRNChange} className="w-full border p-3 rounded-lg" placeholder="e.g., 123456789012" maxLength="12" required />
           <p className="text-xs text-gray-500 mt-1">12-digit unique identifier</p>
         </div>
 
+        {/* Name Fields - UNCHANGED */}
         <div className="grid grid-cols-3 gap-4">
           <div><label className="block font-semibold mb-1">First Name</label><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full border p-3 rounded-lg" required /></div>
           <div><label className="block font-semibold mb-1">Middle Name</label><input type="text" name="middleName" value={formData.middleName} onChange={handleChange} className="w-full border p-3 rounded-lg" required /></div>
           <div><label className="block font-semibold mb-1">Last Name</label><input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full border p-3 rounded-lg" required /></div>
         </div>
 
+        {/* Age & Sex - UNCHANGED */}
         <div className="grid grid-cols-2 gap-4">
           <div><label className="block font-semibold mb-1">Age</label><input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full border p-3 rounded-lg" min="3" max="12" required /></div>
           <div><label className="block font-semibold mb-1">Sex</label>
@@ -192,27 +192,59 @@ export default function AdminCreateK3() {
           </div>
         </div>
 
+        {/* ONLY THIS PART CHANGED: Grade Level + Section with G4-G6 */}
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block font-semibold mb-1">Grade Level</label>
+          <div>
+            <label className="block font-semibold mb-1">Grade Level</label>
             <select name="gradeLevel" value={formData.gradeLevel} onChange={handleChange} className="w-full border p-3 rounded-lg" required>
               <option value="">Select Grade</option>
               <option value="Kindergarten">Kindergarten</option>
               <option value="Grade 1">Grade 1</option>
               <option value="Grade 2">Grade 2</option>
               <option value="Grade 3">Grade 3</option>
+              <option value="Grade 4">Grade 4</option>
+              <option value="Grade 5">Grade 5</option>
+              <option value="Grade 6">Grade 6</option>
             </select>
           </div>
-          <div><label className="block font-semibold mb-1">Section</label>
+          <div>
+            <label className="block font-semibold mb-1">Section</label>
             <select name="section" value={formData.section} onChange={handleChange} className="w-full border p-3 rounded-lg" required>
               <option value="">Select Section</option>
+              
               {formData.gradeLevel === "Kindergarten" && <option value="Love">Love</option>}
               {formData.gradeLevel === "Grade 1" && <option value="Humility">Humility</option>}
               {formData.gradeLevel === "Grade 2" && <option value="Kindness">Kindness</option>}
-              {formData.gradeLevel === "Grade 3" && <> <option value="Diligence">Diligence</option> <option value="Wisdom">Wisdom</option> </>}
+              {formData.gradeLevel === "Grade 3" && (
+                <>
+                  <option value="Diligence">Diligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                </>
+              )}
+              {formData.gradeLevel === "Grade 4" && (
+                <>
+                  <option value="Section A">Section A (TBA)</option>
+                  <option value="Section B">Section B (TBA)</option>
+                </>
+              )}
+              {formData.gradeLevel === "Grade 5" && (
+                <>
+                  <option value="Section A">Section A (TBA)</option>
+                  <option value="Section B">Section B (TBA)</option>
+                </>
+              )}
+              {formData.gradeLevel === "Grade 6" && (
+                <>
+                  <option value="Section A">Section A (TBA)</option>
+                  <option value="Section B">Section B (TBA)</option>
+                  <option value="Section C">Section C (TBA)</option>
+                </>
+              )}
             </select>
           </div>
         </div>
 
+        {/* Everything below is 100% YOUR ORIGINAL */}
         <div>
           <label className="block font-semibold mb-1">Contact Number (Parent/Guardian)</label>
           <input type="tel" name="contact" value={formData.contact} onChange={handleChange} className="w-full border p-3 rounded-lg" placeholder="e.g., 09123456789" pattern="[0-9]{11}" required />

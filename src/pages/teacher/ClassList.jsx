@@ -285,7 +285,7 @@ export default function ClassList() {
 
 {/* === Clean, No-Scroll Table (Fits Perfectly on One Page) === */}
 <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-  <div className="overflow-x-auto">
+  <div className="overflow-x-auto scrollbar-hide">
     <table className="w-full min-w-max table-auto">
       <thead className="bg-gray-50 border-b border-gray-200">
         <tr>
@@ -300,102 +300,90 @@ export default function ClassList() {
           <th className="px-3 py-2 text-center text-xs font-bold text-gray-700 uppercase tracking-wider w-32 text-center">Actions</th>
         </tr>
       </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {loading ? (
-          <tr>
-            <td colSpan="9" className="text-center py-12 text-gray-500 text-sm">
-              Loading students...
-            </td>
-          </tr>
-        ) : filteredStudents.length === 0 ? (
-          <tr>
-            <td colSpan="9" className="text-center py-12 text-gray-500 text-sm">
-              No students found
-            </td>
-          </tr>
-        ) : (
-          filteredStudents.map((student) => (
-            <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-              {/* No. */}
-              <td className="px-5 py-2 text-sm font-semibold text-gray-900">
-                {student.id}
-              </td>
-
-              {/* Student Name + Avatar */}
-              <td className="px-3 py-2">
-                <div className="flex items-center gap-3">
-                  <span className="font-medium text-gray-900 text-sm truncate max-w-xs">
-                    {student.fullName}
-                  </span>
-                </div>
-              </td>
-
-              {/* LRN */}
-              <td className="px-3 py-2 text-sm font-mono text-gray-700">
-                {student.lrn}
-              </td>
-
-              {/* Grade & Section */}
-              <td className="px-3 py-2 text-sm text-gray-700">
-                {student.gradeLevel} - {student.section}
-              </td>
-
-              {/* Age */}
-              <td className="px-3 py-2 text-sm text-center text-gray-700">
-                {student.age}
-              </td>
-
-              {/* Sex */}
-              <td className="px-3 py-2 text-sm text-center text-gray-700">
-                {student.sex}
-              </td>
-
-              {/* WMSU Email */}
-              <td className="px-3 py-2 text-sm text-blue-600 font-mono truncate max-w-xs">
-                {student.wmsuEmail}
-              </td>
-
-              {/* Status */}
-              <td className="px-3 py-2">
-                <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${
-                  student.status === 'Active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {student.status}
-                </span>
-              </td>
-
-              {/* Actions */}
-              <td className="px-3 py-2">
-                <div className="flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => handleView(student)}
-                    className="text-blue-600 hover:text-blue-800 transition"
-                    title="View"
-                  >
-                    <EyeIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleEdit(student)}
-                    className="text-green-600 hover:text-green-800 transition"
-                    title="Edit"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRequest(student)}
-                    className="text-red-600 hover:text-red-800 transition"
-                    title="Delete Request"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {loading ? (
+            <tr>
+              <td colSpan="9" className="text-center py-12 text-gray-500 text-sm">
+                Loading students...
               </td>
             </tr>
-          ))
-        )}
-      </tbody>
+          ) : filteredStudents.length === 0 ? (
+            <tr>
+              <td colSpan="9" className="text-center py-12 text-gray-500 text-sm">
+                No students found
+              </td>
+            </tr>
+          ) : (
+            filteredStudents.map((student, index) => (
+              <tr key={student.id} className="hover:bg-gray-50 transition-colors">
+                {/* No. — NOW ALWAYS 1, 2, 3... PERFECT! */}
+                <td className="px-5 py-4 text-sm font-bold text-gray-900 text-center">
+                  {index + 1}
+                </td>
+
+                {/* Student Name + Avatar */}
+                <td className="px-3 py-4">
+                  <div className="flex items-center">
+                    <span className="font-medium text-gray-900 truncate max-w-xs">
+                      {student.fullName}
+                    </span>
+                  </div>
+                </td>
+
+                {/* LRN */}
+                <td className="px-3 py-4 text-sm font-mono text-gray-700">
+                  {student.lrn}
+                </td>
+
+                {/* Grade & Section */}
+                <td className="px-3 py-4 text-sm text-gray-700">
+                  {student.gradeLevel} - {student.section}
+                </td>
+
+                {/* Age */}
+                <td className="px-3 py-4 text-sm text-center text-gray-700">
+                  {student.age || "-"}
+                </td>
+
+                {/* Sex */}
+                <td className="px-3 py-4 text-sm text-center text-gray-700">
+                  {student.sex || "-"}
+                </td>
+
+                {/* WMSU Email */}
+                <td className="px-3 py-4 text-sm text-blue-600 font-mono truncate max-w-xs">
+                  {student.wmsuEmail}
+                </td>
+
+                {/* Status */}
+                <td className="px-3 py-4 text-center">
+                  <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${
+                    student.status === 'Active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {student.status}
+                  </span>
+                </td>
+
+                {/* Actions */}
+                <td className="px-3 py-4">
+                  <div className="flex items-center justify-center gap-4">
+                    <button onClick={() => handleView(student)} className="text-blue-600 hover:text-blue-800 transition" title="View">
+                      <EyeIcon className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => handleEdit(student)} className="text-green-600 hover:text-green-800 transition" title="Edit">
+                      <PencilSquareIcon className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => handleDeleteRequest(student)} className="text-red-600 hover:text-red-800 transition" title="Request Delete">
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
     </table>
   </div>
 </div>

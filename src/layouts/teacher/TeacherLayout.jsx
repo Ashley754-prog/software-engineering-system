@@ -18,7 +18,7 @@ export default function TeacherLayout() {
         <TeacherTopbar sidebarOpen={sidebarOpen} />
 
         <main className="pt-20 px-8 pb-6 overflow-y-auto min-h-screen">
-          <Outlet />
+          <Outlet context={{ sidebarOpen }} />
         </main>
       </div>
     </div>

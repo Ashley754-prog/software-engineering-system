@@ -4,7 +4,7 @@ export const authService = {
   // Register a new user
   register: async (userData) => {
     try {
-      const response = await api.post('/users/signup', userData);
+      const response = await api.post('/api/users/signup', userData);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }

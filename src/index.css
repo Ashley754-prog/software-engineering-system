@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource/montserrat"; 
+@import "@fontsource/montserrat";
 
 @theme {
   --font-montserrat: "Montserrat", sans-serif;
@@ -7,17 +7,14 @@
 
 body {
   font-family: var(--font-montserrat);
-  @apply text-gray-800;
+  @apply text-gray-800 bg-gray-50;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;    
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  scrollbar-width: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
+  display: none;           
 }

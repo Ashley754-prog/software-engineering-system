@@ -2,7 +2,7 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function ViewStudentModal({ student, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto hide-scrollbar">
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full my-8">
         <div className="p-6">
           {/* Header */}

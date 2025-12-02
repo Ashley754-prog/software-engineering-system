@@ -43,25 +43,31 @@ export default function GradeLevel() {
   const getStudentsInSection = (grade, section) =>
     students.filter((s) => s.gradeLevel === grade && s.section === section);
 
-  // ONLY ONE getColors FUNCTION — THIS IS THE FIX
   const getColors = (headerColor) => {
     const map = {
       "bg-purple-600": { bar: "from-purple-500 to-pink-500", text: "text-purple-700", pillBg: "bg-purple-100", pillText: "text-purple-800", pillHover: "hover:bg-purple-200", icon: "text-purple-600" },
       "bg-blue-600":   { bar: "from-blue-500 to-cyan-500",   text: "text-blue-700",   pillBg: "bg-blue-100",   pillText: "text-blue-800",   pillHover: "hover:bg-blue-200",   icon: "text-blue-600" },
       "bg-green-600":  { bar: "from-green-500 to-emerald-500", text: "text-green-700", pillBg: "bg-green-100", pillText: "text-green-800", pillHover: "hover:bg-green-200", icon: "text-green-600" },
       "bg-yellow-600": { bar: "from-yellow-400 to-orange-500", text: "text-yellow-700", pillBg: "bg-yellow-100", pillText: "text-yellow-800", pillHover: "hover:bg-yellow-200", icon: "text-yellow-600" },
+      "bg-red-600":    { bar: "from-red-500 to-pink-500",     text: "text-red-700",    pillBg: "bg-red-100",    pillText: "text-red-800",    pillHover: "hover:bg-red-200",    icon: "text-red-600" },
+      "bg-indigo-600": { bar: "from-indigo-500 to-purple-500", text: "text-indigo-700", pillBg: "bg-indigo-100", pillText: "text-indigo-800", pillHover: "hover:bg-indigo-200", icon: "text-indigo-600" },
+      "bg-pink-600":   { bar: "from-pink-500 to-rose-500",    text: "text-pink-700",   pillBg: "bg-pink-100",   pillText: "text-pink-800",   pillHover: "hover:bg-pink-200",   icon: "text-pink-600" },
     };
     return map[headerColor] || map["bg-purple-600"];
   };
 
+  // ADDED GRADE 4, 5, 6 WITH SECTIONS AND COLORS
   const gradeLevels = [
     { name: "Kindergarten", color: "bg-purple-600", sections: ["Love"] },
-    { name: "Grade 1", color: "bg-blue-600", sections: ["Humility"] },
-    { name: "Grade 2", color: "bg-green-600", sections: ["Kindness"] },
-    { name: "Grade 3", color: "bg-yellow-600", sections: ["Diligence", "Wisdom"] },
+    { name: "Grade 1",       color: "bg-blue-600",   sections: ["Humility"] },
+    { name: "Grade 2",       color: "bg-green-600",  sections: ["Kindness"] },
+    { name: "Grade 3",       color: "bg-yellow-600", sections: ["Diligence", "Wisdom"] },
+    { name: "Grade 4",       color: "bg-red-600",    sections: ["Section A", "Section B"] },
+    { name: "Grade 5",       color: "bg-indigo-600", sections: ["Section A", "Section B"] },
+    { name: "Grade 6",       color: "bg-pink-600",   sections: ["Section A", "Section B", "Section C"] },
   ];
 
-  // Handlers
+  // Handlers (unchanged)
   const handleView = (student) => { setSelectedStudent(student); setShowViewModal(true); };
   const handleEdit = (student) => { setSelectedStudent(student); setEditFormData({ ...student }); setShowEditModal(true); };
   const handleDeleteRequest = (student) => { setSelectedStudent(student); setDeleteReason(""); setShowDeleteRequestModal(true); };
@@ -123,7 +129,7 @@ export default function GradeLevel() {
   return (
     <>
       {viewingClass ? (
-        // ── CLASS TABLE VIEW ──
+        // CLASS TABLE VIEW (unchanged)
         <div className="space-y-6 p-6">
           <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 flex items-center gap-4">
             <button onClick={() => setViewingClass(null)} className="text-gray-600 hover:text-gray-900">
@@ -186,7 +192,7 @@ export default function GradeLevel() {
           </div>
         </div>
       ) : (
-        // ── MAIN GRADE LEVEL CARDS VIEW ──
+        // MAIN GRADE LEVEL CARDS VIEW — NOW INCLUDES G4-G6
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow p-6 border border-gray-300 border-b-red-800 border-b-4 mb-8">
             <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
@@ -263,7 +269,7 @@ export default function GradeLevel() {
         </div>
       )}
 
-      {/* MODALS */}
+      {/* MODALS — UNTOUCHED */}
       {showViewModal && selectedStudent && (
         <ViewStudentModal student={selectedStudent} onClose={() => setShowViewModal(false)} />
       )}
