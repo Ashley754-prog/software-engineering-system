@@ -24,14 +24,19 @@ const formatStudent = (student) => ({
   average: student.average,
   createdBy: student.created_by,
   createdAt: student.created_at,
-  updatedAt: student.updated_at
+  updatedAt: student.updated_at,
+  guardianName: student.guardian_name,
+  guardianRelationship: student.guardian_relationship,
+  guardianEmail: student.guardian_email,
+  guardianAddress: student.guardian_address
 });
 
 const createStudent = async (req, res) => {
   try {
     const {
       lrn, firstName, middleName, lastName, age, sex,
-      gradeLevel, section, contact, wmsuEmail, password, profilePic
+      gradeLevel, section, contact, wmsuEmail, password, profilePic,
+      guardianName, guardianRelationship, guardianEmail, guardianAddress
     } = req.body;
 
     // VALIDATION
@@ -56,8 +61,8 @@ const createStudent = async (req, res) => {
     // SAVE WITH HASHED PASSWORD
     await pool.query(
       `INSERT INTO students 
-       (lrn, first_name, middle_name, last_name, full_name, age, sex, grade_level, section, contact, wmsu_email, password, profile_pic, qr_code)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (lrn, first_name, middle_name, last_name, full_name, age, sex, grade_level, section, contact, wmsu_email, password, profile_pic, qr_code, guardian_name, guardian_relationship, guardian_email, guardian_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         lrn,
         firstName,
@@ -72,7 +77,11 @@ const createStudent = async (req, res) => {
         wmsuEmail,
         hashedPassword,        // ← NOW HASHED
         profilePic || null,
-        qrCode
+        qrCode,
+        guardianName || null,
+        guardianRelationship || null,
+        guardianEmail || null,
+        guardianAddress || null
       ]
     );
 
@@ -150,7 +159,11 @@ const updateStudent = async (req, res) => {
       attendance: 'attendance',
       average: 'average',
       profilePic: 'profile_pic',
-      qrCode: 'qr_code'
+      qrCode: 'qr_code',
+      guardianName: 'guardian_name',
+      guardianRelationship: 'guardian_relationship',
+      guardianEmail: 'guardian_email',
+      guardianAddress: 'guardian_address'
     };
 
     for (const [key, dbKey] of Object.entries(fields)) {

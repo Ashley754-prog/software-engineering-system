@@ -76,6 +76,15 @@ const createTables = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
       UNIQUE KEY unique_student_subject (student_id, subject)
+    )`,
+
+    // Class Enrollments Table (many-to-many teacher-student)
+    `CREATE TABLE IF NOT EXISTS class_enrollments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      teacher_id INT NOT NULL,
+      student_id INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uniq_teacher_student (teacher_id, student_id)
     )`
   ];
 

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import QRCode from 'qrcode';
+import Papa from "papaparse";
 import authService from "../../api/userService";
 
 export default function AdminCreateStudentAccounts() {
   const [formData, setFormData] = useState({
     profilePic: "",
+
     lrn: "",
     firstName: "",
     middleName: "",
@@ -21,6 +23,10 @@ export default function AdminCreateStudentAccounts() {
 
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvResults, setCsvResults] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,6 +46,158 @@ export default function AdminCreateStudentAccounts() {
     setFormData({ ...formData, password: password });
     setGeneratedPassword(password);
     setShowPassword(true);
+  };
+
+  const downloadSampleCsv = () => {
+    const header = "lrn,full_name,section,grade,email,password,age,sex,contact\n";
+    const sample = "2025000002,Juana Dela Cruz,10-A,10,2025000002@wmsu.edu.ph,Temp1234,10,Male,09123456789\n";
+    const blob = new Blob([header + sample], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "students-sample.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCsvFileChange = (e) => {
+    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+    setCsvFile(file);
+    setCsvResults([]);
+    setUploadError("");
+  };
+
+  const processCsvRows = async (rows) => {
+    setIsUploading(true);
+    setUploadError("");
+    const results = [];
+
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      const rowNumber = index + 2;
+
+      try {
+        const lrn = (row.lrn || "").toString().trim();
+        const fullName = (row.full_name || "").toString().trim();
+        const section = (row.section || "").toString().trim();
+        const grade = (row.grade || "").toString().trim();
+        const email = (row.email || "").toString().trim();
+        const password = (row.password || "").toString().trim();
+        const ageStr = (row.age ?? "").toString().trim();
+        const sex = (row.sex || "").toString().trim();
+        const contact = (row.contact || "").toString().trim();
+
+        if (!lrn || !fullName || !section || !grade || !email || !password || !ageStr || !sex || !contact) {
+          throw new Error("Missing required fields (lrn, full_name, section, grade, email, password, age, sex, contact)");
+        }
+
+        if (!email.toLowerCase().endsWith("@wmsu.edu.ph")) {
+          throw new Error("Email must end with @wmsu.edu.ph");
+        }
+
+        const age = parseInt(ageStr, 10);
+        if (Number.isNaN(age)) {
+          throw new Error(`Invalid age value: "${ageStr}"`);
+        }
+
+        // Split full_name into first, middle, last (best-effort)
+        const nameParts = fullName.split(" ").filter(Boolean);
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+        const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
+
+        const gradeLevel = grade; // Map CSV "grade" to backend "gradeLevel"
+
+        const studentData = {
+          lrn,
+          firstName,
+          middleName,
+          lastName,
+          age,
+          sex,
+
+          gradeLevel,
+          section,
+          contact,
+          wmsuEmail: email,
+          password,
+          profilePic: null
+        };
+
+        const response = await fetch('http://localhost:3001/api/students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(studentData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create student');
+        }
+
+        try {
+          await authService.register({
+            email: email,
+            password: password,
+            confirmPassword: password,
+            firstName: firstName,
+            lastName: lastName,
+            username: lrn,
+            role: "student",
+          });
+        } catch (err) {
+          console.error("Failed to create auth user for student from CSV:", err);
+        }
+
+        results.push({
+          row: rowNumber,
+          lrn,
+          email,
+          password,
+          status: "Success",
+          error: ""
+        });
+      } catch (error) {
+        console.error("CSV row error:", error);
+        results.push({
+          row: rowNumber,
+          lrn: row.lrn || "",
+          email: row.email || "",
+          password: "",
+          status: "Failed",
+          error: error.message || "Unknown error"
+        });
+      }
+    }
+
+    setCsvResults(results);
+    setIsUploading(false);
+  };
+
+  const handleCsvUpload = () => {
+    if (!csvFile) {
+      setUploadError("Please select a CSV file first.");
+      return;
+    }
+
+    Papa.parse(csvFile, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (!results || !results.data) {
+          setUploadError("CSV file is empty or invalid.");
+          return;
+        }
+        processCsvRows(results.data);
+      },
+      error: (error) => {
+        console.error("CSV parse error:", error);
+        setUploadError(error.message || "Failed to parse CSV file.");
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -126,6 +284,72 @@ export default function AdminCreateStudentAccounts() {
       <div className="bg-white shadow rounded-lg p-6 border-b-4 border-b-red-800">
         <h2 className="text-4xl font-bold text-gray-900">Create Student Account (K to Grade 6)</h2>
         <p className="text-gray-600 mt-2">Admin-only form for generating student accounts and QR codes.</p>
+      </div>
+      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow mx-auto space-y-4">
+        <h3 className="text-2xl font-semibold text-gray-900">Bulk Upload Student Accounts via CSV</h3>
+        <p className="text-gray-600 text-sm">
+          Upload a CSV file to create multiple student accounts at once. Make sure the file follows the required format.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={downloadSampleCsv}
+            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 text-sm font-semibold"
+          >
+            Download Sample CSV
+          </button>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleCsvFileChange}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            onClick={handleCsvUpload}
+            disabled={isUploading}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${isUploading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+          >
+            {isUploading ? "Uploading..." : "Upload & Create Accounts"}
+          </button>
+        </div>
+        {uploadError && (
+          <p className="text-red-600 text-sm mt-2">
+            {uploadError}
+          </p>
+        )}
+        {csvResults.length > 0 && (
+          <div className="mt-4 max-h-64 overflow-y-auto border border-gray-200 rounded-md">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-gray-100 text-gray-800">
+                <tr>
+                  <th className="px-3 py-2 border">Row</th>
+                  <th className="px-3 py-2 border">LRN</th>
+                  <th className="px-3 py-2 border">Email</th>
+                  <th className="px-3 py-2 border">Password</th>
+                  <th className="px-3 py-2 border">Status</th>
+                  <th className="px-3 py-2 border">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {csvResults.map((result) => (
+                  <tr key={result.row} className="hover:bg-gray-50">
+                    <td className="px-3 py-2 border">{result.row}</td>
+                    <td className="px-3 py-2 border">{result.lrn}</td>
+                    <td className="px-3 py-2 border">{result.email}</td>
+                    <td className="px-3 py-2 border">{result.password}</td>
+                    <td className="px-3 py-2 border">
+                      <span className={result.status === "Success" ? "text-green-700" : "text-red-700"}>
+                        {result.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 border text-xs text-red-700">{result.error}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-white p-6 rounded-lg shadow mx-auto space-y-5">

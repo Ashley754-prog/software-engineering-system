@@ -17,6 +17,10 @@ export default function StudentProfile() {
     wmsuEmail: "",
     lrn: "",
     profilePic: "",
+    guardianName: "",
+    guardianRelationship: "",
+    guardianEmail: "",
+    guardianAddress: "",
   });
 
   const studentId = localStorage.getItem("studentId");
@@ -44,6 +48,10 @@ export default function StudentProfile() {
           wmsuEmail: data.wmsuEmail || "",
           lrn: data.lrn || "",
           profilePic: data.profilePic || "",
+          guardianName: data.guardianName || "",
+          guardianRelationship: data.guardianRelationship || "",
+          guardianEmail: data.guardianEmail || "",
+          guardianAddress: data.guardianAddress || "",
         });
       } catch (err) {
         setError(err.message || "Failed to load student profile");
@@ -85,6 +93,10 @@ export default function StudentProfile() {
         contact: profile.contact,
         wmsuEmail: profile.wmsuEmail,
         profilePic: profile.profilePic,
+        guardianName: profile.guardianName,
+        guardianRelationship: profile.guardianRelationship,
+        guardianEmail: profile.guardianEmail,
+        guardianAddress: profile.guardianAddress,
       };
 
       const res = await fetch(`http://localhost:3001/api/students/${studentId}`, {
@@ -112,6 +124,10 @@ export default function StudentProfile() {
         wmsuEmail: s.wmsuEmail || prev.wmsuEmail,
         lrn: s.lrn || prev.lrn,
         profilePic: s.profilePic || prev.profilePic,
+        guardianName: s.guardianName || prev.guardianName,
+        guardianRelationship: s.guardianRelationship || prev.guardianRelationship,
+        guardianEmail: s.guardianEmail || prev.guardianEmail,
+        guardianAddress: s.guardianAddress || prev.guardianAddress,
       }));
 
       setIsEditing(false);
@@ -224,6 +240,18 @@ export default function StudentProfile() {
                     <p className="text-gray-600">
                       <strong>Contact:</strong> {profile.contact || "Not set"}
                     </p>
+                    <p className="text-gray-600">
+                      <strong>Parent/Guardian Name:</strong> {profile.guardianName || "Not set"}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Relationship:</strong> {profile.guardianRelationship || "Not set"}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Parent/Guardian Gmail:</strong> {profile.guardianEmail || "Not set"}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Address:</strong> {profile.guardianAddress || "Not set"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -309,6 +337,56 @@ export default function StudentProfile() {
                         className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-200 focus:border-red-800 transition text-lg"
                         placeholder="123456789@wmsu.edu.ph"
                       />
+                    </div>
+                    {/* Parent / Guardian Information */}
+                    <div className="md:col-span-2 mt-4">
+                      <h5 className="text-lg font-bold text-gray-800 mb-4">Parent / Guardian Information</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-2">Parent/Guardian Name</label>
+                          <input
+                            type="text"
+                            name="guardianName"
+                            value={profile.guardianName}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-200 focus:border-red-800 transition text-lg"
+                            placeholder="e.g., Maria Dela Cruz"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-2">Relationship</label>
+                          <input
+                            type="text"
+                            name="guardianRelationship"
+                            value={profile.guardianRelationship}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-200 focus:border-red-800 transition text-lg"
+                            placeholder="e.g., Mother, Father, Guardian"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-2">Parent/Guardian Gmail</label>
+                          <input
+                            type="email"
+                            name="guardianEmail"
+                            value={profile.guardianEmail}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-200 focus:border-red-800 transition text-lg"
+                            placeholder="e.g., parent@gmail.com"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-2">Address</label>
+                          <input
+                            type="text"
+                            name="guardianAddress"
+                            value={profile.guardianAddress}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-200 focus:border-red-800 transition text-lg"
+                            placeholder="e.g., Barangay, City, Province"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 

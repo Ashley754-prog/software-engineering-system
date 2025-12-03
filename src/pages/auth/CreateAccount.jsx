@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import { authService } from "../../api/userService";
@@ -26,19 +26,47 @@ export default function CreateAccount() {
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
     role: "teacher", // Default to teacher
+    subjects: [], // Array to store selected subjects
+    gradeLevels: [], // Array to store selected grade levels
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const generatePassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+    let password = "";
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+  const generateUsername = (firstName, lastName) => {
+    const cleanFirst = firstName.toLowerCase().replace(/\s/g, '');
+    const cleanLast = lastName.toLowerCase().replace(/\s/g, '');
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `${cleanFirst}.${cleanLast}${randomNum}`;
+  };
+
+  useEffect(() => {
+    if (formData.firstName && formData.lastName) {
+      const username = generateUsername(formData.firstName, formData.lastName);
+      setFormData(prev => ({ ...prev, username }));
+    }
+  }, [formData.firstName, formData.lastName]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGeneratePassword = () => {
+    const newPassword = generatePassword();
+    setFormData(prev => ({ ...prev, password: newPassword }));
   };
 
   const handleSubmit = async (e) => {
@@ -71,7 +99,9 @@ export default function CreateAccount() {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: formData.role,
+        subjects: formData.subjects,
+        gradeLevels: formData.gradeLevels
       };
 
       const response = await fetch('http://localhost:3001/api/teachers', {
@@ -200,48 +230,321 @@ export default function CreateAccount() {
             </select>
           </div>
 
-          <div className="relative">
+          {formData.role === "teacher" && (
+            <div className="flex gap-6">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">Grade Level to Handle</label>
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade1"
+                      name="gradeLevels"
+                      value="Grade 1"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade1" className="text-sm">Grade 1</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade2"
+                      name="gradeLevels"
+                      value="Grade 2"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade2" className="text-sm">Grade 2</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade3"
+                      name="gradeLevels"
+                      value="Grade 3"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade3" className="text-sm">Grade 3</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade4"
+                      name="gradeLevels"
+                      value="Grade 4"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade4" className="text-sm">Grade 4</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade5"
+                      name="gradeLevels"
+                      value="Grade 5"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade5" className="text-sm">Grade 5</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="grade6"
+                      name="gradeLevels"
+                      value="Grade 6"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          gradeLevels: checked 
+                            ? [...prev.gradeLevels, value]
+                            : prev.gradeLevels.filter(level => level !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="grade6" className="text-sm">Grade 6</label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">Subjects to Handle</label>
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="math"
+                      name="subjects"
+                      value="Mathematics"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="math" className="text-sm">Mathematics</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="english"
+                      name="subjects"
+                      value="English"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="english" className="text-sm">English</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="science"
+                      name="subjects"
+                      value="Science"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="science" className="text-sm">Science</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="filipino"
+                      name="subjects"
+                      value="Filipino"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="filipino" className="text-sm">Filipino</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="araling-pilipinas"
+                      name="subjects"
+                      value="Araling Panlipunan"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="araling-pilipinas" className="text-sm">Araling Panlipunan</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="esp"
+                      name="subjects"
+                      value="Edukasyon sa Pagpapakatao"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="esp" className="text-sm">Edukasyon sa Pagpapakatao</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="mapeh"
+                      name="subjects"
+                      value="MAPEH"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="mapeh" className="text-sm">MAPEH</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="tle"
+                      name="subjects"
+                      value="TLE"
+                      onChange={(e) => {
+                        const { checked, value } = e.target;
+                        setFormData(prev => ({
+                          ...prev,
+                          subjects: checked 
+                            ? [...prev.subjects, value]
+                            : prev.subjects.filter(subject => subject !== value)
+                        }));
+                      }}
+                      className="mr-2"
+                    />
+                    <label htmlFor="tle" className="text-sm">TLE</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
             <label className="text-sm font-medium text-gray-700">Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full mt-1 p-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[42px] text-gray-500 hover:text-gray-700"
-            >
-              {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-            </button>
+            <div className="flex gap-2">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="flex-1 border p-3 rounded-lg"
+                placeholder="Click 'Generate Password'"
+                required
+              />
+              <button
+                type="button"
+                onClick={handleGeneratePassword}
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Generate Password
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
 
-          <div className="relative">
-            <label className="text-sm font-medium text-gray-700">Confirm Password</label>
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full mt-1 p-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-[42px] text-gray-500 hover:text-gray-700"
-            >
-              {showConfirmPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-            </button>
-          </div>
-
-          <hr className="border-gray-400 mt-8 mb-5" />
+<hr className="border-gray-400 mt-8 mb-5" />
           <div className="flex items-center justify-center space-x-3 border border-gray-400 rounded-md p-3 w-[280px] mx-auto">
             <input id="captcha" type="checkbox" />
-            <span className="text-sm">I’m not a robot</span>
+            <span className="text-sm">I'm not a robot</span>
             <div className="border border-gray-400 p-2 text-[10px] text-gray-500">reCAPTCHA</div>
           </div>
 
