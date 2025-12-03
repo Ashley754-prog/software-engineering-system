@@ -22,7 +22,10 @@ router.get('/portal', async (req, res) => {
     // Get grades
     const [grades] = await pool.query(`
       SELECT subject, q1, q2, q3, q4, 
-             ROUND((q1 + q2 + q3 + q4)/4, 2) AS average
+             ROUND(
+               (COALESCE(q1, 0) + COALESCE(q2, 0) + COALESCE(q3, 0) + COALESCE(q4, 0)) / 
+               NULLIF((q1 IS NOT NULL) + (q2 IS NOT NULL) + (q3 IS NOT NULL) + (q4 IS NOT NULL), 0), 2
+             ) AS average
       FROM grades WHERE student_id = ?
     `, [studentId]);
 
@@ -44,10 +47,12 @@ router.get('/portal', async (req, res) => {
         q3: g.q3,
         q4: g.q4,
         average: g.average,
-        remarks: g.average >= 90 ? 'Outstanding' :
-                g.average >= 85 ? 'Very Satisfactory' :
-                g.average >= 80 ? 'Satisfactory' :
-                g.average >= 75 ? 'Fairly Satisfactory' : 'Did Not Meet Expectations'
+        remarks: g.average ? 
+          (g.average >= 90 ? 'Outstanding' :
+           g.average >= 85 ? 'Very Satisfactory' :
+           g.average >= 80 ? 'Satisfactory' :
+           g.average >= 75 ? 'Fairly Satisfactory' : 'Did Not Meet Expectations')
+          : 'Pending'
       })),
       // attendance: [...],  // add later
       // schedule: [...]     // add later

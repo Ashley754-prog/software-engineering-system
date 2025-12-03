@@ -6,6 +6,7 @@ const cors = require('cors');
 const studentRoutes = require('./routes/students');
 const deleteRequestRoutes = require('./routes/deleteRequests');
 const gradeRoutes = require('./routes/grades');
+const gradeRequestRoutes = require('./routes/gradeRequests');
 const teacherRoutes = require('./routes/teachers');
 const classRoutes = require('./routes/classes');
 
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/students', studentRoutes);
 app.use('/api/delete-requests', deleteRequestRoutes);
 app.use('/api/students', gradeRoutes); // grades under students
+app.use('/api/grade-requests', gradeRequestRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/student', require('./routes/studentPortal'));
